@@ -1,5 +1,5 @@
 export type AdminProduct = {
-  id: string; name: string; category: string; description: string; sku: string; barcode: string;
+  id: string; version?: number; currency?: "TRY"; name: string; category: string; description: string; sku: string; barcode: string;
   priceCents: number; costCents: number; stock: number; variants: string[]; images: string[];
   status: "live" | "draft"; model: "own" | "supplier"; seoTitle: string; seoDescription: string; createdAt: string;
 };

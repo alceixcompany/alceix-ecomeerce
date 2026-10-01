@@ -5,11 +5,11 @@ export function getAdminStore(slug: string): AdminStore | undefined {
 }
 export const operations = [
   { id: "profile", icon: "storefront", title: "Mağaza & Profil Ayarları", description: "Mağaza adı, bio, açılış saatleri ve sosyal medya hesaplarınızı düzenleyin.", status: "Güncel", action: "Profili Düzenle", tone: "green" },
-  { id: "supplier", icon: "hub", title: "Tedarikçi & API Bağlantıları", description: "Tedarikçilerinizi bağlayın; ürün, stok ve fiyat akışını tek yerden takip edin.", status: "3 tedarikçi aktif", action: "Bağlantıları İncele", tone: "blue" },
-  { id: "studio", icon: "auto_fix_high", title: "AI Sanal Manken & Stüdyo", description: "Ürünleriniz için yeni bir görünüm oluşturun. Görsellerinizi satışa hazırlayın.", status: "450 kredi", action: "Stüdyoyu Aç", tone: "blue" },
-  { id: "orders", icon: "local_shipping", title: "Sipariş & Gönderi Merkezi", description: "Hazırlanacak siparişler, kargo etiketleri ve teslimat durumları bir arada.", status: "14 gönderi bekliyor", action: "Siparişleri Gör", tone: "red" },
-  { id: "finance", icon: "account_balance_wallet", title: "Cüzdan, Komisyon & Finans", description: "Bakiyenizi, satış gelirlerinizi ve ödeme takviminizi kolayca takip edin.", status: "+₺1.093 bu hafta", action: "Finans Detayları", tone: "blue" },
-  { id: "support", icon: "support_agent", title: "Destek & Müşteri Masası", description: "Müşteri mesajları, iade talepleri ve destek görüşmelerinizi yönetin.", status: "0 bekleyen talep", action: "Destek Masası", tone: "green" },
+  { id: "supplier", icon: "hub", title: "Tedarikçi & API Bağlantıları", description: "Tedarikçilerinizi bağlayın; ürün, stok ve fiyat akışını tek yerden takip edin.", status: "Bağlantı bekleniyor", action: "Bağlantıları İncele", tone: "blue" },
+  { id: "studio", icon: "auto_fix_high", title: "AI Sanal Manken & Stüdyo", description: "Ürünleriniz için yeni bir görünüm oluşturun. Görsellerinizi satışa hazırlayın.", status: "Henüz etkin değil", action: "Stüdyoyu Aç", tone: "blue" },
+  { id: "orders", icon: "local_shipping", title: "Sipariş & Gönderi Merkezi", description: "Hazırlanacak siparişler, kargo etiketleri ve teslimat durumları bir arada.", status: "Henüz etkin değil", action: "Siparişleri Gör", tone: "red" },
+  { id: "finance", icon: "account_balance_wallet", title: "Cüzdan, Komisyon & Finans", description: "Bakiyenizi, satış gelirlerinizi ve ödeme takviminizi kolayca takip edin.", status: "Henüz etkin değil", action: "Finans Detayları", tone: "blue" },
+  { id: "support", icon: "support_agent", title: "Destek & Müşteri Masası", description: "Müşteri mesajları, iade talepleri ve destek görüşmelerinizi yönetin.", status: "Henüz etkin değil", action: "Destek Masası", tone: "green" },
 ] as const;
 export type OperationId = typeof operations[number]["id"];
 export const salesSeries = {

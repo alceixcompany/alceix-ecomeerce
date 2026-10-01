@@ -145,7 +145,7 @@ return (
 <span className="material-symbols-outlined absolute left-3 top-3 text-on-surface-variant text-[20px]" aria-hidden="true">
 {"badge"}
 </span>
-<input className="w-full pl-10 pr-4 py-2.5 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/60 focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container outline-none transition-all" placeholder="Adınız ve Soyadınız" required type="text" id="influencer-field-0" name="influencer-field-0" autoComplete="name" />
+<input className="w-full pl-10 pr-4 py-2.5 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/60 focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container outline-none transition-all" placeholder="Adınız ve Soyadınız" required type="text" id="influencer-field-0" name="name" autoComplete="name" />
 </div>
 </div>
 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -157,7 +157,7 @@ return (
 <span className="material-symbols-outlined absolute left-3 top-3 text-on-surface-variant text-[20px]" aria-hidden="true">
 {"phone"}
 </span>
-<input className="w-full pl-10 pr-4 py-2.5 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/60 focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container outline-none transition-all" placeholder="05XX XXX XX XX" required type="tel" id="influencer-field-1" name="influencer-field-1" pattern="[+0-9 ()-]{10,20}" autoComplete="tel" />
+<input className="w-full pl-10 pr-4 py-2.5 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/60 focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container outline-none transition-all" placeholder="05XX XXX XX XX" required type="tel" id="influencer-field-1" name="phone" pattern="[+0-9 ()-]{10,20}" autoComplete="tel" />
 </div>
 </div>
 <div>
@@ -168,7 +168,7 @@ return (
 <span className="material-symbols-outlined absolute left-3 top-3 text-on-surface-variant text-[20px]" aria-hidden="true">
 {"mail"}
 </span>
-<input className="w-full pl-10 pr-4 py-2.5 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/60 focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container outline-none transition-all" placeholder="ornek@alceix.com" required type="email" id="influencer-field-2" name="influencer-field-2" autoComplete="email" />
+<input className="w-full pl-10 pr-4 py-2.5 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/60 focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container outline-none transition-all" placeholder="ornek@alceix.com" required type="email" id="influencer-field-2" name="email" autoComplete="email" />
 </div>
 </div>
 </div>
@@ -177,7 +177,7 @@ return (
 <label className="block font-label-sm text-label-sm font-semibold text-on-surface mb-1" htmlFor="influencer-field-3">
 {"Ana Platform"}
 </label>
-<select className="w-full px-3.5 py-2.5 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container outline-none transition-all" required id="influencer-field-3" name="influencer-field-3">
+<select className="w-full px-3.5 py-2.5 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container outline-none transition-all" required id="influencer-field-3" name="platform">
 <option value="instagram">
 {"Instagram"}
 </option>
@@ -200,7 +200,7 @@ return (
 <span className="material-symbols-outlined absolute left-3 top-3 text-on-surface-variant text-[20px]" aria-hidden="true">
 {"alternate_email"}
 </span>
-<input className="w-full pl-10 pr-4 py-2.5 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/60 focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container outline-none transition-all" placeholder="@username veya link" required type="text" id="influencer-field-4" name="influencer-field-4" />
+<input className="w-full pl-10 pr-4 py-2.5 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/60 focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container outline-none transition-all" placeholder="@username veya link" required type="text" id="influencer-field-4" name="profile" />
 </div>
 </div>
 </div>
@@ -209,7 +209,7 @@ return (
 <label className="block font-label-sm text-label-sm font-semibold text-on-surface mb-1" htmlFor="influencer-field-5">
 {"Kitle Büyüklüğü"}
 </label>
-<select className="w-full px-3.5 py-2.5 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container outline-none transition-all" required id="influencer-field-5" name="influencer-field-5">
+<select className="w-full px-3.5 py-2.5 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container outline-none transition-all" required id="influencer-field-5" name="followers">
 <option value="nano">
 {"< 10K (Nano Creator)"}
 </option>
@@ -228,7 +228,7 @@ return (
 <label className="block font-label-sm text-label-sm font-semibold text-on-surface mb-1" htmlFor="influencer-field-6">
 {"Odak Alanı / Kategori"}
 </label>
-<select className="w-full px-3.5 py-2.5 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container outline-none transition-all" required id="influencer-field-6" name="influencer-field-6">
+<select className="w-full px-3.5 py-2.5 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container outline-none transition-all" required id="influencer-field-6" name="category">
 <option value="fashion">
 {"Moda & Giyim"}
 </option>
@@ -253,19 +253,19 @@ return (
 </label>
 <div className="space-y-2">
 <label className="flex items-center gap-2.5 p-2 rounded-lg bg-surface-container-low hover:bg-surface-container cursor-pointer transition-colors">
-<input defaultChecked className="w-4 h-4 text-primary-container focus:ring-primary-container" name="partnership_type" type="radio" value="4" />
+<input defaultChecked className="w-4 h-4 text-primary-container focus:ring-primary-container" name="partnershipType" type="radio" value="coupon" />
 <span className="font-body-sm text-body-sm text-on-surface">
 {"Özel İndirim Kuponu & Hikaye Paylaşımı"}
 </span>
 </label>
 <label className="flex items-center gap-2.5 p-2 rounded-lg bg-surface-container-low hover:bg-surface-container cursor-pointer transition-colors">
-<input className="w-4 h-4 text-primary-container focus:ring-primary-container" name="partnership_type" type="radio" value="5" />
+<input className="w-4 h-4 text-primary-container focus:ring-primary-container" name="partnershipType" type="radio" value="affiliate" />
 <span className="font-body-sm text-body-sm text-on-surface">
 {"UTM Affiliate Link (Bio & Swipe-Up)"}
 </span>
 </label>
 <label className="flex items-center gap-2.5 p-2 rounded-lg bg-surface-container-low hover:bg-surface-container cursor-pointer transition-colors">
-<input className="w-4 h-4 text-primary-container focus:ring-primary-container" name="partnership_type" type="radio" value="6" />
+<input className="w-4 h-4 text-primary-container focus:ring-primary-container" name="partnershipType" type="radio" value="boutique" />
 <span className="font-body-sm text-body-sm text-on-surface">
 {"Kendi Adıma Kişisel Seçki Butiği Açma"}
 </span>

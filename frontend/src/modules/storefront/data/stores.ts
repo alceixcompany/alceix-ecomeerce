@@ -1,5 +1,5 @@
 export type StoreProduct = {
-  id: string;
+  id: string; priceCents?: number; stock?: number;
   name: string;
   category: string;
   image: string;
@@ -9,6 +9,8 @@ export type StoreProduct = {
   badge?: string;
 };
 export type Store = {
+  id?: string; real?: boolean; canPurchase?: boolean; bannerImage?: string; logoImage?: string; faviconImage?: string; seoTitle?: string; seoDescription?: string; catalogTotal?: number; categories?: string[]; categoryCounts?: Record<string,number>;
+  catalogPage?: number; catalogPageCount?: number; catalogQuery?: string; catalogAll?: number;
   slug: string;
   name: string;
   initials: string;

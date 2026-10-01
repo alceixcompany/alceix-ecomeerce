@@ -3,6 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { currentAccount } from "@/modules/marketing-auth";
+import { importSample } from "../services/catalog-api";
+import { errorMessage, ApiError } from "@/lib/http";
 import { routes } from "@/config/routes";
 
 const categories = ["Tüm Kategoriler", "Giyim & Moda", "Kozmetik & Bakım", "Ev & Yaşam", "Teknoloji & Aksesuar"];
@@ -18,12 +21,10 @@ export function DropshippingCatalog() {
   const [category, setCategory] = useState(categories[0]);
   const [added, setAdded] = useState<string[]>([]);
   const [message, setMessage] = useState("");
+  const [isAdding,setIsAdding]=useState(false);
   const filtered = products.filter((product) => category === categories[0] || product.category === category);
 
-  function addProduct(id: string, name: string) {
-    setAdded((current) => current.includes(id) ? current : [...current, id]);
-    setMessage(`${name} demo vitrininize eklendi. Gerçek mağazanıza ürün aktarmak için mağaza kurulumunu tamamlayın.`);
-  }
+  async function addProduct(id:string,name:string){if(isAdding)return;setIsAdding(true);try{const account=await currentAccount();const store=account.stores[0];if(!store){setMessage("Önce bir mağaza oluşturun.");return;}await importSample(store.slug,id);setAdded(current=>[...current,id]);setMessage(`${name}, ${store.name} mağazanıza örnek taslak olarak eklendi. Gerçek tedarikçi bağlantısı ve stok henüz yok.`);}catch(error){setMessage(error instanceof ApiError && error.status===401?"Ürünü mağazanıza eklemek için giriş yapın.":errorMessage(error));}finally{setIsAdding(false);}}
 
   return <section className="w-full bg-white py-16 border-t border-surface-container" id="katalog">
     <div className="max-w-[1280px] mx-auto px-4 lg:px-6">
@@ -51,7 +52,7 @@ export function DropshippingCatalog() {
               </div>
             </div>
           </div>
-          <div className="p-4 pt-0"><button type="button" disabled={added.includes(product.id)} onClick={() => addProduct(product.id, product.name)} className="w-full py-3 px-3 rounded-xl bg-primary-container hover:bg-primary disabled:bg-tertiary text-white text-label-sm font-semibold flex items-center justify-center gap-2" aria-label={`${product.name}: ${added.includes(product.id) ? "Demo vitrine eklendi" : "Mağazama ekle"}`}><span className="material-symbols-outlined text-[18px]" aria-hidden="true">{added.includes(product.id) ? "check_circle" : "add_shopping_cart"}</span>{added.includes(product.id) ? "Demo Vitrine Eklendi" : "Mağazama Ekle"}</button></div>
+          <div className="p-4 pt-0"><button type="button" disabled={isAdding || added.includes(product.id)} onClick={() => addProduct(product.id, product.name)} className="w-full py-3 px-3 rounded-xl bg-primary-container hover:bg-primary disabled:bg-tertiary text-white text-label-sm font-semibold flex items-center justify-center gap-2" aria-label={`${product.name}: ${added.includes(product.id) ? "Taslağa eklendi" : "Mağazama ekle"}`}><span className="material-symbols-outlined text-[18px]" aria-hidden="true">{added.includes(product.id) ? "check_circle" : "add_shopping_cart"}</span>{added.includes(product.id) ? "Taslağa Eklendi" : "Mağazama Ekle"}</button></div>
         </article>)}
       </div>
       <p role="status" className="mt-4 text-body-sm text-primary">{message}</p>

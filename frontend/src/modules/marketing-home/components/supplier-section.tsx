@@ -157,25 +157,25 @@ export function SupplierSection() {
             <h4 className="font-title-md text-title-md text-on-surface font-bold mb-4">
               {"B2B Tedarikçi Başvuru Formu"}
             </h4>
-            <ApplicationForm className="space-y-3.5">
+            <ApplicationForm type="supplier" className="space-y-3.5">
               <div className="space-y-1">
                 <label className="font-label-sm text-label-sm text-on-surface font-semibold" htmlFor="application-1-1">
                   {"Firma / Şirket Ünvanı"}
                 </label>
-                <input className="w-full px-3.5 py-2.5 bg-surface-container-lowest border border-surface-container rounded-xl text-body-md text-on-surface focus:outline-none focus:border-secondary" placeholder="Örn: Nordik Tekstil San. ve Tic. A.Ş." required type="text" id="application-1-1" name="application-1-1" />
+                <input className="w-full px-3.5 py-2.5 bg-surface-container-lowest border border-surface-container rounded-xl text-body-md text-on-surface focus:outline-none focus:border-secondary" placeholder="Örn: Nordik Tekstil San. ve Tic. A.Ş." required type="text" id="application-1-1" name="companyName" />
               </div>
               <div className="space-y-1">
                 <label className="font-label-sm text-label-sm text-on-surface font-semibold" htmlFor="application-1-4">
                   {"Yetkili İletişim (Telefon / E-posta)"}
                 </label>
-                <input className="w-full px-3.5 py-2.5 bg-surface-container-lowest border border-surface-container rounded-xl text-body-md text-on-surface focus:outline-none focus:border-secondary" placeholder="Örn: 0532 xxx xx xx | info@firma.com" required type="text" id="application-1-4" name="application-1-4" />
+                <input className="w-full px-3.5 py-2.5 bg-surface-container-lowest border border-surface-container rounded-xl text-body-md text-on-surface focus:outline-none focus:border-secondary" placeholder="Örn: 0532 xxx xx xx | info@firma.com" required type="text" id="application-1-4" name="contact" />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="font-label-sm text-label-sm text-on-surface font-semibold" htmlFor="application-1-8">
                     {"Ürün Kategorisi"}
                   </label>
-                  <select className="w-full px-3 py-2 bg-surface-container-lowest border border-surface-container rounded-xl text-body-sm text-on-surface focus:outline-none focus:border-secondary" id="application-1-8" name="application-1-8">
+                  <select className="w-full px-3 py-2 bg-surface-container-lowest border border-surface-container rounded-xl text-body-sm text-on-surface focus:outline-none focus:border-secondary" id="application-1-8" name="category">
                     <option>
                       {"Tekstil & Giyim"}
                     </option>
@@ -200,7 +200,7 @@ export function SupplierSection() {
                   <label className="font-label-sm text-label-sm text-on-surface font-semibold" htmlFor="application-1-17">
                     {"Aylık Sevkiyat Kapasitesi"}
                   </label>
-                  <select className="w-full px-3 py-2 bg-surface-container-lowest border border-surface-container rounded-xl text-body-sm text-on-surface focus:outline-none focus:border-secondary" id="application-1-17" name="application-1-17">
+                  <select className="w-full px-3 py-2 bg-surface-container-lowest border border-surface-container rounded-xl text-body-sm text-on-surface focus:outline-none focus:border-secondary" id="application-1-17" name="monthlyCapacity">
                     <option>
                       {"500 - 2.000 Paket / Ay"}
                     </option>

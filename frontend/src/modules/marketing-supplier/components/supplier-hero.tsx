@@ -97,33 +97,33 @@ export function SupplierHero() {
                   <label className="block font-label-sm text-label-sm text-on-surface mb-1.5 font-semibold" htmlFor="companyName">
                     {" Firma / Marka Ticari Unvanı "}
                   </label>
-                  <input className="w-full px-4 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-body-sm text-body-sm placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary transition-all" id="companyName" placeholder="Örn: ABC Tekstil San. ve Tic. Ltd. Şti." required type="text" />
+                  <input className="w-full px-4 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-body-sm text-body-sm placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary transition-all" id="companyName" name="companyName" placeholder="Örn: ABC Tekstil San. ve Tic. Ltd. Şti." required type="text" />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block font-label-sm text-label-sm text-on-surface mb-1.5 font-semibold" htmlFor="contactName">
                       {" Yetkili Adı & Soyadı "}
                     </label>
-                    <input className="w-full px-4 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-body-sm text-body-sm placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary transition-all" id="contactName" placeholder="Ad Soyad" required type="text" />
+                    <input className="w-full px-4 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-body-sm text-body-sm placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary transition-all" id="contactName" name="contactName" placeholder="Ad Soyad" required type="text" />
                   </div>
                   <div>
                     <label className="block font-label-sm text-label-sm text-on-surface mb-1.5 font-semibold" htmlFor="contactPhone">
                       {" Telefon Numarası "}
                     </label>
-                    <input className="w-full px-4 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-body-sm text-body-sm placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary transition-all" id="contactPhone" placeholder="05XX XXX XX XX" required type="tel" />
+                    <input className="w-full px-4 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-body-sm text-body-sm placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary transition-all" id="contactPhone" name="phone" placeholder="05XX XXX XX XX" required type="tel" />
                   </div>
                 </div>
                 <div>
                   <label className="block font-label-sm text-label-sm text-on-surface mb-1.5 font-semibold" htmlFor="contactEmail">
                     {" Kurumsal E-Posta Adresi "}
                   </label>
-                  <input className="w-full px-4 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-body-sm text-body-sm placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary transition-all" id="contactEmail" placeholder="tedarik@sirketiniz.com" required type="email" />
+                  <input className="w-full px-4 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-body-sm text-body-sm placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary transition-all" id="contactEmail" name="email" placeholder="tedarik@sirketiniz.com" required type="email" />
                 </div>
                 <div>
                   <label className="block font-label-sm text-label-sm text-on-surface mb-1.5 font-semibold" htmlFor="category">
                     {" Ana Ürün Kategorisi "}
                   </label>
-                  <select className="w-full px-4 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-body-sm text-body-sm focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary transition-all" id="category" required defaultValue="">
+                  <select className="w-full px-4 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-body-sm text-body-sm focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary transition-all" id="category" name="category" required defaultValue="">
                     <option disabled value="">
                       {"Kategori Seçiniz"}
                     </option>
@@ -152,7 +152,7 @@ export function SupplierHero() {
                     <label className="block font-label-sm text-label-sm text-on-surface mb-1.5 font-semibold" htmlFor="skuCount">
                       {" Aktif SKU Sayısı "}
                     </label>
-                    <select className="w-full px-4 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-body-sm text-body-sm focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary transition-all" id="skuCount" required defaultValue="">
+                    <select className="w-full px-4 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-body-sm text-body-sm focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary transition-all" id="skuCount" name="skuCount" required defaultValue="">
                       <option disabled value="">
                         {"Seçiniz"}
                       </option>
@@ -171,7 +171,7 @@ export function SupplierHero() {
                     <label className="block font-label-sm text-label-sm text-on-surface mb-1.5 font-semibold" htmlFor="dailyCapacity">
                       {" Günlük Paket Kapasitesi "}
                     </label>
-                    <select className="w-full px-4 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-body-sm text-body-sm focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary transition-all" id="dailyCapacity" required defaultValue="">
+                    <select className="w-full px-4 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-body-sm text-body-sm focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary transition-all" id="dailyCapacity" name="dailyCapacity" required defaultValue="">
                       <option disabled value="">
                         {"Seçiniz"}
                       </option>

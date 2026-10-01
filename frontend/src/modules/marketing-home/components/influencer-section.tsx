@@ -115,25 +115,25 @@ export function InfluencerSection() {
                 {"Anında Onay"}
               </span>
             </div>
-            <ApplicationForm className="space-y-4">
+            <ApplicationForm type="influencer" className="space-y-4">
               <div className="space-y-1.5">
                 <label className="font-label-sm text-label-sm text-on-surface font-semibold" htmlFor="application-0-1">
                   {"Ad Soyad"}
                 </label>
-                <input className="w-full px-4 py-2.5 bg-surface-container-low border border-surface-container rounded-xl text-body-md text-on-surface focus:outline-none focus:border-primary" placeholder="Örn: Melisa Aydın" required type="text" id="application-0-1" name="application-0-1" />
+                <input className="w-full px-4 py-2.5 bg-surface-container-low border border-surface-container rounded-xl text-body-md text-on-surface focus:outline-none focus:border-primary" placeholder="Örn: Melisa Aydın" required type="text" id="application-0-1" name="name" />
               </div>
               <div className="space-y-1.5">
                 <label className="font-label-sm text-label-sm text-on-surface font-semibold" htmlFor="application-0-4">
                   {"Instagram / TikTok Profil Linki (@username)"}
                 </label>
-                <input className="w-full px-4 py-2.5 bg-surface-container-low border border-surface-container rounded-xl text-body-md text-on-surface focus:outline-none focus:border-primary" placeholder="Örn: @melisaydin veya instagram.com/melisaydin" required type="text" id="application-0-4" name="application-0-4" />
+                <input className="w-full px-4 py-2.5 bg-surface-container-low border border-surface-container rounded-xl text-body-md text-on-surface focus:outline-none focus:border-primary" placeholder="Örn: @melisaydin veya instagram.com/melisaydin" required type="text" id="application-0-4" name="profile" />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <label className="font-label-sm text-label-sm text-on-surface font-semibold" htmlFor="application-0-8">
                     {"Takipçi Sayısı"}
                   </label>
-                  <select className="w-full px-3 py-2.5 bg-surface-container-low border border-surface-container rounded-xl text-body-sm text-on-surface focus:outline-none focus:border-primary" id="application-0-8" name="application-0-8">
+                  <select className="w-full px-3 py-2.5 bg-surface-container-low border border-surface-container rounded-xl text-body-sm text-on-surface focus:outline-none focus:border-primary" id="application-0-8" name="followers">
                     <option>
                       {"10K - 50K Takipçi"}
                     </option>
@@ -152,7 +152,7 @@ export function InfluencerSection() {
                   <label className="font-label-sm text-label-sm text-on-surface font-semibold" htmlFor="application-0-15">
                     {"İçerik Alanı"}
                   </label>
-                  <select className="w-full px-3 py-2.5 bg-surface-container-low border border-surface-container rounded-xl text-body-sm text-on-surface focus:outline-none focus:border-primary" id="application-0-15" name="application-0-15">
+                  <select className="w-full px-3 py-2.5 bg-surface-container-low border border-surface-container rounded-xl text-body-sm text-on-surface focus:outline-none focus:border-primary" id="application-0-15" name="category">
                     <option>
                       {"Moda & Giyim"}
                     </option>

@@ -1,0 +1,4 @@
+.ui-skeleton,.progressive-image[data-pending=true]{background-color:var(--skeleton-base,#edf0f4);--skeleton-shimmer:linear-gradient(100deg,transparent 15%,#ffffff99 45%,transparent 75%);background-image:var(--skeleton-shimmer);background-size:220% 100%;animation:catalog-shimmer 1.5s ease-in-out infinite}
+.ui-skeleton{display:block;border-radius:8px;width:100%;height:14px}
+@keyframes catalog-shimmer{from{background-position:150% 0}to{background-position:-100% 0}}
+@media(prefers-reduced-motion:reduce){.ui-skeleton,.progressive-image[data-pending=true]{animation:none}}
