@@ -1,23 +1,11 @@
-# Müşteri mağaza yönetimi
+# Mağaza yönetimi
 
-`/{storeSlug}/admin` ve `/{storeSlug}/admin/dashboard` aynı müşteri genel bakışını gösterir. Demo slug kayıtları: `firmaadi`, `magazaadi`, `luma-studio`. Bilinmeyen mağaza 404 döner. Panelin ortak pazarlama başlığı yoktur; ayrı yerleşimi vardır.
+`/{storeSlug}/admin` ve `/admin/dashboard` aynı genel bakışı; `/admin/ayarlar` profil/taslağı; `/admin/urunler` kataloğu gösterir. Sunucu `server.ts` üzerinden gerçek oturum ve mağaza sahipliğini doğrular. Girişsiz kullanıcı giriş sayfasına gider; başka mağaza/bilinmeyen mağaza 404 olur.
 
-Sihirbaz adımları, menüler ve operasyon kartları erişilebilir native dialog ile ilgili modül önizlemesini açar. Mağaza adı yalnızca bileşen state'inde güncellenir. Gerçek sipariş, ödeme, stok veya kullanıcı işlemi yapılmaz. `mocks/dashboard.ts` tipli örnek verinin sahibidir.
+`services/admin-api.ts` runtime doğrulanan API adaptörüdür. Katalog, ayarlar, taslak, kategori ve dosya kayıtları backend'de saklanır; localStorage/base64 kalıcılığı yoktur. Ürünler ve public vitrin tek kaynaktır. Listeleme server-side filtre/sıralama/altılı sayfalama; fiyat/stok/model ek filtreleri, 300 ms debounce, iptal edilen istekler ve sınırlı sayfa düğmeleri; CSV tüm filtrelenmiş sayfaları alır ve hücre formül enjeksiyonunu önler.
 
-SVG satış çizelgesi hafta/ay seçimi, fare/dokunma ve klavye ile veri noktası seçimi içerir. Sayısal değerler örnektir. API, kalıcı kayıt ve oturum/yetki entegrasyonu henüz yoktur; `noindex` güvenlik sağlamaz. Gerçek mağaza verisi bağlanmadan önce sunucuda oturum ve tenant yetkisi doğrulanmalıdır. Dört rolün diğer panelleri kapsam dışındadır.
+Ürün dialogu mevcut üç aşamayı korur. TRY fiyatlar kuruş tamsayısı, brüt marj komisyon/kargo/vergi dışındadır. Satışa yayınlama fiyat/görsel gerektirir. Version çakışmaları kaydı ezmez; +10 stok sunucuda atomiktir; kopya taslak olur. Varyantlar seçenek adlarıdır, ayrı SKU/stock yoktur. Yükleme sırasında tablo ölçülerini koruyan skeleton gösterilir; hata tekrar denemesi vardır.
 
-## Mağaza profili ve ayarlar
+Profil/taslak kaydı sunucudadır; taslak vitrini değiştirmez. Slug değişince panel yeni adrese geçer; eski adres alias değildir. Profil PNG/JPG/WebP en fazla 4 MB, ürün en fazla altı × 15 MB; gerçek yükleme kalıcı media URL döner. Dosya kaldırma ilişkiden ayırır; arka planda kullanılmayan dosya temizliği henüz yoktur.
 
-`/{storeSlug}/admin/ayarlar` dört bölüm içerir: kimlik, iletişim, medya ve SEO. Ortak admin menüsü ve üst bar `components/admin-shell.tsx` tarafından yönetilir. Dashboard profil kartı ve menü bu sayfaya gider. Vitrin ayarları aynı sayfanın görsel kimlik bölümüne bağlanır.
-
-Metin ve çalışma modu ayarları canlı önizlemeye yansır. Kayıt ve taslak işlemleri `alceix:store-settings:{storeSlug}` kapsamıyla yalnızca tarayıcıda saklanır; bilinmeyen JSON doğrulanmadan kullanılmaz. Gerçek URL uygunluğu, satış modu, özel domain ve yayınlama işlemleri API olmadan uygulanmaz. Kaydedilmemiş değişiklikte tarayıcıdan ayrılma uyarısı bulunur.
-
-PNG/JPG/WebP medya en fazla 4 MB kabul edilir; blob URL'leri önizleme sonunda temizlenir. Görseller bu oturumda kalır, sunucuya yüklenmez. Banner ve logo sağ önizlemeye yansır. Kayıt, görsel dosyalarını kalıcılaştırmaz.
-
-## Ürün yönetimi
-
-`/{storeSlug}/admin/urunler`: gerçek demo kayıt sayısına göre satış/taslak/kritik stok sekmeleri, kategori, Türkçe arama, fiyat/stok sıralama, altılı sayfalama ve CSV dışa aktarımı. Paylaşılabilir filtreler URL sorgusundadır. CSV hücreleri elektronik tablo formülü enjeksiyonuna karşı kaçırılır.
-
-Ürün ekleme/düzenleme native dialog içinde üç aşamadır: kimlik/görseller, fiyat/stok/varyant seçenekleri, SEO/önizleme. Fiyatlar kuruş tamsayısıdır; brüt marj vergi, kargo ve komisyonu içermez. SKU benzersizliği, fiyat, stok ve barkod doğrulanır. Taslak eksik fiyat/görselle kaydedilebilir; satışa geçerken tamamlanır. Varyant adları seçenek olarak saklanır; varyant bazlı stok henüz yoktur.
-
-Katalog `alceix:products:{storeSlug}` anahtarında bu tarayıcıda saklanır. PNG/JPG/WebP en fazla altı adet, her biri en fazla 15 MB kabul edilir; yerel depolama kotası aşılırsa kayıt durur ve daha küçük görsel önerilir. Dosyalar base64 olarak yerelde kalır. Kapak seçimi, görsel kaldırma, ürün kopyası oluşturma, +10 demo stok ve satış/taslak anahtarı çalışır. Gerçek API/senkronizasyon, AI görsel üretimi, canlı yayın ve sipariş işlemi yapılmaz. Örnek açıklama metni bir şablondur.
+Dashboard katalog/kurulum özetinden türetilir. Satış, müşteri, sipariş ve bakiye servisleri henüz yok; sayısal demo başarıları gösterilmez. Operasyon menüleri mevcut dialoglarla servis durumunu açıklar. Özel domain/AI/finans/kargo iş akışları uygulanmış sayılmaz. Ayrıntılar: [backend raporu](../../../../backend/docs/implementation-review.md).
