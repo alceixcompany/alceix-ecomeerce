@@ -1,0 +1,12 @@
+.dropshipping-page { overflow-x: clip; }
+.dropshipping-page #katalog { scroll-margin-top: 100px; }
+.dropshipping-page summary::-webkit-details-marker { display: none; }
+.dropshipping-page input { font: inherit; }
+.dropshipping-page .partner-logo { filter: grayscale(1); opacity: .8; }
+.dropshipping-page .partner-logo:hover { filter: none; opacity: 1; }
+.dropshipping-page .h-56 { height: 224px; }
+@media (max-width: 639px) {
+  .dropshipping-page .text-display { font-size: 32px; line-height: 1.2; }
+  .dropshipping-page section { padding-block: 48px; }
+  .dropshipping-page img.h-\[440px\] { height: 360px; }
+}

@@ -1,0 +1,17 @@
+export const routes = {
+  home: "/",
+  about: "/hakkimizda",
+  features: "/alceix-avantajlari",
+  platform: "/platform-ozellikleri",
+  suppliers: "/dropshipping-tedarik",
+  influencer: "/influencer-ol",
+  influencerApplication: "/influencer-ol#influencer-form",
+  supplierApplication: "/tedarikci-ol",
+  partners: "/is-ortaklarimiz",
+  references: "/hakkimizda#referanslar",
+  faq: "/sss",
+  login: "/giris-yap",
+  register: "/kayit-ol",
+  blog: "/blog",
+  contact: "/iletisim",
+} as const;

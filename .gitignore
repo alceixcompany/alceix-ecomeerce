@@ -1,0 +1,27 @@
+# macOS metadata
+.DS_Store
+._*
+
+# Local recovery copies
+/.dataless-backups/
+
+# Dependencies and generated output
+node_modules/
+.next/
+.next-preview/
+out/
+build/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# Local environment and credentials
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+
+# Logs and local deployment state
+*.log
+.vercel/

@@ -1,0 +1,11 @@
+.influencer-page { overflow-x: clip; }
+.influencer-page #influencer-form { scroll-margin-top: 110px; }
+.influencer-page summary::-webkit-details-marker { display: none; }
+.influencer-page input, .influencer-page select { min-width: 0; }
+.influencer-page input[type="radio"] { accent-color: #0066ff; flex-shrink: 0; }
+.influencer-page .partner-logo { filter: grayscale(1); opacity: .75; }
+.influencer-page .partner-logo:hover { filter: none; opacity: 1; }
+@media (max-width: 639px) {
+  .influencer-page section > .max-w-7xl { padding-inline: 20px; }
+  .influencer-page .text-display { font-size: 34px; line-height: 1.18; }
+}

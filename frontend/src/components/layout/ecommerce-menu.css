@@ -1,0 +1,46 @@
+.marketing-home .ecommerce-menu-trigger { background:none; border:none; cursor:pointer; font:inherit; font-size:13px; font-weight:650; gap:5px; }
+.marketing-home .ecommerce-menu-trigger .material-symbols-outlined { font-size:19px; }
+.marketing-home .ecommerce-menu-trigger[aria-expanded="true"] { color:#0050cb; }
+.marketing-home .ecommerce-panel { position:fixed; top:80px; left:0; right:0; background:#fff; border-top:1px solid #edf1f7; border-bottom:1px solid #e5eeff; box-shadow:0 24px 32px #0b1c3012; max-height:calc(100dvh - 80px); overflow-y:auto; }
+.marketing-home .ecommerce-panel-inner { max-width:1480px; margin:auto; padding:40px 48px; display:grid; grid-template-columns:250px minmax(0,1fr) 300px; gap:36px; }
+.marketing-home .ecommerce-categories { display:flex; flex-direction:column; gap:12px; padding-right:28px; border-right:1px solid #e5eaf2; }
+.marketing-home .ecommerce-categories button { display:flex; align-items:center; gap:12px; padding:18px 14px; background:none; border:none; border-radius:10px; color:#253043; font-size:14px; font-weight:650; text-align:left; cursor:pointer; }
+.marketing-home .ecommerce-categories button .material-symbols-outlined { font-size:21px; color:#69778c; }
+.marketing-home .ecommerce-categories button .material-symbols-outlined:last-child { margin-left:auto; font-size:17px; }
+.marketing-home .ecommerce-categories button[aria-pressed="true"],.marketing-home .ecommerce-categories button:hover { background:#eff4ff; color:#0050cb; }
+.marketing-home .ecommerce-links { display:flex; flex-direction:column; }
+.marketing-home .ecommerce-group-label { color:#8b96a7; letter-spacing:.12em; font-size:10px; text-transform:uppercase; margin:6px 0 24px; }
+.marketing-home .ecommerce-link-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:32px 24px; }
+.marketing-home .ecommerce-link-grid a { display:block; padding:10px 0; }
+.marketing-home .ecommerce-link-grid strong { display:flex; gap:10px; justify-content:space-between; font-size:15px; line-height:1.5; font-weight:650; }
+.marketing-home .ecommerce-link-grid strong span { color:#a8b4c6; }
+.marketing-home .ecommerce-link-grid a > span { display:block; margin-top:8px; color:#7b8595; font-size:12px; line-height:1.85; }
+.marketing-home .ecommerce-link-grid a:hover strong { color:#0050cb; }
+.marketing-home .ecommerce-panel-note { display:flex; align-items:center; gap:10px; margin-top:auto; padding-top:36px; color:#718199; font-size:11px; }
+.marketing-home .ecommerce-panel-note .material-symbols-outlined { color:#0066ff; font-size:18px; }
+.marketing-home .ecommerce-feature { border-left:1px solid #e5eaf2; padding-left:28px; }
+.marketing-home .ecommerce-feature-art { position:relative; overflow:hidden; height:210px; border-radius:14px; background:#dce9ff; }
+.marketing-home .ecommerce-feature-art > img { width:100%; height:100%; object-fit:cover; }
+.marketing-home .ecommerce-feature-tag { position:absolute; top:14px; left:14px; font-size:7px; font-weight:700; letter-spacing:.06em; background:#ffffffed; color:#0050cb; padding:7px 9px; border-radius:5px; }
+.marketing-home .ecommerce-feature-card { position:absolute; left:12px; right:12px; bottom:12px; padding:12px; background:#ffffffed; border-radius:10px; display:grid; grid-template-columns:28px 1fr; gap:4px 8px; }
+.marketing-home .ecommerce-feature-card .material-symbols-outlined { grid-row:span 2; color:#0066ff; }
+.marketing-home .ecommerce-feature-card strong { font-size:11px; font-weight:700; }
+.marketing-home .ecommerce-feature-card small { font-size:9px; color:#75839b; }
+.marketing-home .ecommerce-feature h3 { margin-top:20px; font-size:18px; font-weight:700; line-height:1.55; letter-spacing:-.035em; }
+.marketing-home .ecommerce-feature > p { margin-top:10px; color:#7b8595; font-size:12px; line-height:1.8; }
+.marketing-home .ecommerce-feature-cta { display:flex; gap:14px; align-items:center; margin-top:18px; color:#0050cb; font-size:13px; }
+.marketing-home .site-login-link { padding:11px 15px; border:1px solid #dce7f8; border-radius:10px; font-size:12px; }
+.marketing-home .site-header-actions { gap:10px; }
+.marketing-home .site-desktop-navigation { gap:13px; }
+.marketing-home .site-navigation-link { font-size:12px; }
+.marketing-home .mobile-ecommerce summary { display:flex; align-items:center; justify-content:space-between; list-style:none; padding:12px 16px; font-size:14px; font-weight:650; cursor:pointer; }
+.marketing-home .mobile-ecommerce summary::-webkit-details-marker { display:none; }
+.marketing-home .mobile-ecommerce > summary { color:#0050cb; }
+.marketing-home .mobile-ecommerce > details { margin:0 10px; border-top:1px solid #eff4ff; }
+.marketing-home .mobile-ecommerce details summary { font-size:12px; }
+.marketing-home .mobile-ecommerce details a { font-size:12px; color:#62718c; padding-left:24px; }
+.marketing-home .mobile-account-links { display:grid; grid-template-columns:1fr 1fr; gap:8px; border-top:1px solid #e5eeff; margin-top:12px; padding-top:12px; }
+.marketing-home .mobile-account-links a { justify-content:center; background:#eff4ff; color:#0050cb; font-size:12px; }
+.marketing-home .mobile-account-links a:last-child { background:#0066ff; color:white; }
+@media(min-width:1360px) { .marketing-home .site-navigation-link { font-size:13px; } }
+@media(max-width:639px) { .marketing-home .site-login-link { display:none; } .marketing-home .site-header-cta { max-width:none; white-space:nowrap; } }

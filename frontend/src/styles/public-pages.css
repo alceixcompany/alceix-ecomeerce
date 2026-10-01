@@ -1,0 +1,119 @@
+.public-page { font-family: "Plus Jakarta Sans", Arial, sans-serif; color: #0b1c30; background: #fff; overflow-x: clip; }
+.public-container { width: min(1200px, calc(100% - 48px)); margin-inline: auto; }
+.public-intro { background: radial-gradient(ellipse at 50% 20%, #e5eeff 0%, #f8f9ff 70%); padding: 24px 0 64px; }
+.public-breadcrumb { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; color: #727687; font-size: 12px; }
+.public-breadcrumb a:hover { color: #0050cb; }
+.public-intro-content { max-width: 780px; text-align: center; margin: 54px auto 0; }
+.public-eyebrow { display: inline-flex; align-items: center; gap: 8px; color: #0050cb; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.public-eyebrow::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #0066ff; }
+.public-intro h1 { margin: 16px 0; font-size: clamp(32px, 4.3vw, 52px); font-weight: 800; line-height: 1.13; letter-spacing: -.045em; }
+.public-intro h1 span { color: #0066ff; }
+.public-intro-content > p { max-width: 640px; margin: 0 auto; font-size: 15px; line-height: 1.8; color: #62718c; }
+.public-section { padding-block: 72px; }
+.public-section-soft { background: #f8f9ff; }
+.public-section h2 { font-size: clamp(26px, 3vw, 36px); font-weight: 750; line-height: 1.25; letter-spacing: -.035em; }
+.public-section-description { color: #62718c; font-size: 14px; line-height: 1.8; max-width: 650px; margin-top: 12px; }
+.public-button { display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 22px; border-radius: 12px; border: none; background: #0066ff; color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; }
+.public-button:hover { background: #0050cb; }
+.public-button-light { background: #eff4ff; color: #0050cb; }
+.public-button-light:hover { background: #e5eeff; }
+.public-icon { display: inline-grid; place-items: center; width: 44px; height: 44px; background: #e5eeff; color: #0066ff; border-radius: 12px; }
+.public-help { display: flex; align-items: center; justify-content: space-between; gap: 28px; padding: 36px; border-radius: 20px; background: #eff4ff; }
+.public-help h2 { font-size: 24px; }
+.public-help p { margin-top: 8px; color: #62718c; font-size: 13px; line-height: 1.8; }
+.public-help-actions { display: flex; gap: 12px; flex-shrink: 0; flex-wrap: wrap; }
+.faq-search { position: relative; display: flex; align-items: center; gap: 12px; margin: -28px auto 0; width: calc(100% - 36px); max-width: 620px; padding: 16px 18px; background: white; border: 1px solid #dce7f8; border-radius: 14px; box-shadow: 0 10px 32px #0050cb08; }
+.faq-search input { flex: 1; min-width: 0; border: none; background: transparent; font-size: 14px; color: #0b1c30; }
+.faq-search .material-symbols-outlined { color: #0066ff; }
+.faq-search button { color: #727687; background: transparent; border: none; display: grid; place-items: center; }
+.faq-controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 32px; }
+.faq-controls button { padding: 10px 18px; background: #f8f9ff; border: 1px solid #e5eeff; border-radius: 999px; color: #62718c; font-size: 12px; font-weight: 600; }
+.faq-controls button[aria-pressed="true"] { background: #0066ff; border-color: #0066ff; color: white; }
+.faq-results { width: min(860px, 100%); margin-inline: auto; }
+.faq-result-count { color: #727687; font-size: 12px; margin-bottom: 20px; }
+.faq-item { margin-bottom: 12px; border: 1px solid #e5eeff; background: #f8f9ff; border-radius: 14px; }
+.faq-item summary { display: flex; justify-content: space-between; gap: 20px; align-items: center; padding: 22px 24px; list-style: none; font-size: 14px; font-weight: 650; }
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary .material-symbols-outlined { color: #0066ff; font-size: 20px; }
+.faq-item[open] { background: #eff4ff; }
+.faq-item[open] summary .material-symbols-outlined { transform: rotate(180deg); }
+.faq-answer { margin: 0 24px; padding: 0 0 24px; font-size: 13px; color: #62718c; line-height: 1.9; }
+.faq-empty { text-align: center; padding: 56px 24px; background: #f8f9ff; border-radius: 16px; }
+.faq-empty h2 { font-size: 22px; margin: 18px 0 12px; }
+.faq-empty p { color: #62718c; font-size: 13px; line-height: 1.8; margin-bottom: 24px; }
+.partner-intro-logos { margin-top: 36px; }
+.partner-service-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin-top: 36px; }
+.partner-service { border: 1px solid #e5eeff; border-radius: 20px; padding: 28px; background: #fff; display: flex; flex-direction: column; align-items: flex-start; }
+.partner-service h3 { margin: 22px 0 10px; font-size: 20px; font-weight: 700; letter-spacing: -.035em; }
+.partner-service > p { font-size: 13px; line-height: 1.9; color: #62718c; flex: 1; }
+.partner-service-tag { margin-top: 24px; padding: 8px 12px; border-radius: 8px; background: #eff4ff; color: #0050cb; font-size: 11px; font-weight: 650; }
+.partner-logistics { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+.carrier-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.carrier-grid div { padding: 26px 18px; border: 1px solid #e5eeff; border-radius: 14px; background: white; font-size: 17px; font-weight: 700; text-align: center; }
+.carrier-grid div:last-child { grid-column: 1 / -1; }
+.auth-section { background: radial-gradient(ellipse at 15% 35%, #e5eeff 0, #f8f9ff 65%); padding: 64px 0 80px; }
+.auth-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; max-width: 1080px; margin: auto; }
+.auth-story h1 { margin: 18px 0; font-size: clamp(34px, 4vw, 48px); line-height: 1.15; letter-spacing: -.045em; font-weight: 800; }
+.auth-story h1 span { color: #0066ff; }
+.auth-story > p { font-size: 14px; line-height: 1.9; color: #62718c; max-width: 430px; }
+.auth-benefits { display: grid; gap: 18px; margin: 32px 0; padding: 0; list-style: none; }
+.auth-benefits li { display: flex; gap: 14px; align-items: center; font-size: 13px; font-weight: 650; }
+.auth-benefits small { display: block; font-size: 12px; font-weight: 400; color: #62718c; margin-top: 4px; }
+.auth-mini-store { background: white; border: 1px solid #dce7f8; border-radius: 18px; padding: 24px; max-width: 430px; transform: rotate(-2deg); box-shadow: 0 18px 40px #0b1c300a; }
+.auth-mini-store-head { display: flex; align-items: center; justify-content: space-between; padding-bottom: 18px; border-bottom: 1px solid #eff4ff; font-size: 12px; font-weight: 700; }
+.auth-mini-store-head span { background: #e1ffec; color: #006645; padding: 5px 10px; border-radius: 999px; font-size: 10px; }
+.auth-mini-store-body { display: flex; gap: 14px; align-items: center; padding-top: 18px; }
+.auth-mini-store-body .public-icon { width: 68px; height: 68px; }
+.auth-mini-store-body strong { display: block; font-size: 16px; }
+.auth-mini-store-body p { font-size: 12px; color: #62718c; margin-top: 6px; }
+.auth-card { padding: 32px; border-radius: 24px; background: white; border: 1px solid #e5eeff; box-shadow: 0 20px 64px #0050cb0d; }
+.auth-tabs { display: grid; grid-template-columns: 1fr 1fr; padding: 5px; gap: 5px; border-radius: 12px; background: #f8f9ff; margin-bottom: 28px; }
+.auth-tabs a { padding: 11px; text-align: center; font-size: 13px; font-weight: 650; border-radius: 9px; color: #727687; }
+.auth-tabs a[aria-current="page"] { background: #fff; color: #0050cb; box-shadow: 0 2px 8px #0b1c300a; }
+.auth-card h2 { font-size: 26px; font-weight: 750; letter-spacing: -.035em; margin-bottom: 8px; }
+.auth-subtitle { font-size: 12px; line-height: 1.8; color: #62718c; margin-bottom: 24px; }
+.auth-form { display: grid; gap: 16px; }
+.auth-field label { display: block; font-size: 12px; font-weight: 650; margin-bottom: 8px; }
+.auth-input { position: relative; }
+.auth-input input { width: 100%; padding: 13px 44px 13px 14px; font-size: 13px; color: #0b1c30; border: 1px solid #e5eeff; border-radius: 10px; background: #f8f9ff; }
+.auth-input input:focus { background: white; }
+.auth-input button { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); display: grid; place-items: center; padding: 5px; border: none; background: transparent; color: #727687; }
+.auth-field small { display: block; font-size: 10px; color: #727687; margin-top: 7px; }
+.auth-forgot { justify-self: end; border: none; background: none; color: #0050cb; font-size: 12px; padding: 0; }
+.auth-message { border-radius: 12px; background: #eff4ff; color: #424656; padding: 16px; font-size: 12px; line-height: 1.8; }
+.auth-message a { color: #0050cb; text-decoration: underline; font-weight: 650; }
+.auth-card-foot { margin-top: 22px; padding-top: 20px; border-top: 1px solid #eff4ff; text-align: center; font-size: 12px; color: #727687; }
+.auth-card-foot a { color: #0050cb; font-weight: 650; }
+@media (max-width: 959px) {
+  .auth-grid { gap: 32px; }
+  .auth-card { padding: 24px; }
+  .auth-mini-store { display: none; }
+  .partner-service-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 767px) {
+  .public-container { width: calc(100% - 36px); }
+  .public-intro { padding-bottom: 48px; }
+  .public-intro-content { margin-top: 36px; }
+  .public-section { padding-block: 48px; }
+  .public-help { flex-direction: column; align-items: flex-start; padding: 28px; }
+  .public-help-actions { width: 100%; }
+  .partner-logistics { grid-template-columns: 1fr; gap: 28px; }
+  .auth-section { padding: 40px 0 48px; }
+  .auth-grid { grid-template-columns: 1fr; gap: 28px; }
+  .auth-story { text-align: center; }
+  .auth-story > p { margin-inline: auto; }
+  .auth-story h1 { font-size: 34px; }
+  .auth-benefits { display: none; }
+}
+@media (max-width: 479px) {
+  .partner-service-grid { grid-template-columns: 1fr; }
+  .faq-item summary { padding: 18px; font-size: 13px; }
+  .faq-answer { margin-inline: 18px; }
+  .faq-controls { gap: 8px; }
+  .faq-controls button { padding: 9px 12px; font-size: 11px; }
+}
+
+.auth-faq-heading { text-align:center; margin-bottom:32px; }
+.auth-faq-heading h2 { margin-top:14px; }
+.auth-faq-heading p { margin-top:12px; color:#62718c; font-size:14px; }
+.auth-faq-footer { text-align:center; margin-top:28px; color:#0050cb; font-weight:650; font-size:13px; }

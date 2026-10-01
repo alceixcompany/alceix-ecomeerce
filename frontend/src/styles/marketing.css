@@ -1,0 +1,197 @@
+@theme {
+  --color-on-primary-fixed-variant: #003fa4;
+  --color-secondary-fixed-dim: #a7c8ff;
+  --color-surface-container-high: #dce9ff;
+  --color-on-primary-container: #f8f7ff;
+  --color-tertiary: #006645;
+  --color-tertiary-fixed: #6ffbbe;
+  --color-on-surface-variant: #424656;
+  --color-on-background: #0b1c30;
+  --color-primary-container: #0066ff;
+  --color-on-secondary-fixed: #001c3b;
+  --color-secondary-fixed: #d5e3ff;
+  --color-on-tertiary-container: #e1ffec;
+  --color-on-tertiary-fixed: #002113;
+  --color-on-tertiary-fixed-variant: #005236;
+  --color-inverse-surface: #213145;
+  --color-inverse-on-surface: #eaf1ff;
+  --color-surface-tint: #0054d6;
+  --color-error-container: #ffdad6;
+  --color-on-error: #ffffff;
+  --color-surface-container-highest: #d3e4fe;
+  --color-surface: #f8f9ff;
+  --color-primary-fixed: #dae1ff;
+  --color-tertiary-fixed-dim: #4edea3;
+  --color-outline-variant: #c2c6d8;
+  --color-surface-bright: #f8f9ff;
+  --color-secondary: #005cad;
+  --color-on-surface: #0b1c30;
+  --color-on-secondary-container: #fefcff;
+  --color-on-secondary-fixed-variant: #004788;
+  --color-on-primary: #ffffff;
+  --color-surface-container-lowest: #ffffff;
+  --color-on-primary-fixed: #001849;
+  --color-tertiary-container: #008259;
+  --color-primary: #0050cb;
+  --color-surface-container: #e5eeff;
+  --color-error: #ba1a1a;
+  --color-on-tertiary: #ffffff;
+  --color-on-secondary: #ffffff;
+  --color-surface-container-low: #eff4ff;
+  --color-surface-variant: #d3e4fe;
+  --color-on-error-container: #93000a;
+  --color-outline: #727687;
+  --color-secondary-container: #0074d9;
+  --color-background: #f8f9ff;
+  --color-surface-dim: #cbdbf5;
+  --color-inverse-primary: #b3c5ff;
+  --color-primary-fixed-dim: #b3c5ff;
+  --font-display: "Plus Jakarta Sans", Arial, sans-serif;
+  --text-display: 44px;
+  --text-display--line-height: 52px;
+  --text-display--letter-spacing: -.03em;
+  --text-display--font-weight: 800;
+  --font-headline-lg: "Plus Jakarta Sans", Arial, sans-serif;
+  --text-headline-lg: 36px;
+  --text-headline-lg--line-height: 44px;
+  --text-headline-lg--letter-spacing: -.025em;
+  --text-headline-lg--font-weight: 700;
+  --font-headline-md: "Plus Jakarta Sans", Arial, sans-serif;
+  --text-headline-md: 28px;
+  --text-headline-md--line-height: 36px;
+  --text-headline-md--letter-spacing: -.02em;
+  --text-headline-md--font-weight: 700;
+  --font-headline-sm: "Plus Jakarta Sans", Arial, sans-serif;
+  --text-headline-sm: 20px;
+  --text-headline-sm--line-height: 28px;
+  --text-headline-sm--letter-spacing: -.015em;
+  --text-headline-sm--font-weight: 600;
+  --font-headline-lg-mobile: "Plus Jakarta Sans", Arial, sans-serif;
+  --text-headline-lg-mobile: 28px;
+  --text-headline-lg-mobile--line-height: 36px;
+  --text-headline-lg-mobile--letter-spacing: -.02em;
+  --text-headline-lg-mobile--font-weight: 700;
+  --font-body-lg: "Plus Jakarta Sans", Arial, sans-serif;
+  --text-body-lg: 16px;
+  --text-body-lg--line-height: 26px;
+  --text-body-lg--letter-spacing: -.005em;
+  --text-body-lg--font-weight: 400;
+  --font-body-md: "Plus Jakarta Sans", Arial, sans-serif;
+  --text-body-md: 14px;
+  --text-body-md--line-height: 22px;
+  --text-body-md--letter-spacing: 0em;
+  --text-body-md--font-weight: 400;
+  --font-body-sm: "Plus Jakarta Sans", Arial, sans-serif;
+  --text-body-sm: 13px;
+  --text-body-sm--line-height: 18px;
+  --text-body-sm--letter-spacing: 0em;
+  --text-body-sm--font-weight: 400;
+  --font-title-md: "Plus Jakarta Sans", Arial, sans-serif;
+  --text-title-md: 16px;
+  --text-title-md--line-height: 24px;
+  --text-title-md--letter-spacing: -.01em;
+  --text-title-md--font-weight: 600;
+  --font-label-md: "Plus Jakarta Sans", Arial, sans-serif;
+  --text-label-md: 14px;
+  --text-label-md--line-height: 20px;
+  --text-label-md--letter-spacing: .005em;
+  --text-label-md--font-weight: 600;
+  --font-label-sm: "Plus Jakarta Sans", Arial, sans-serif;
+  --text-label-sm: 12px;
+  --text-label-sm--line-height: 16px;
+  --text-label-sm--letter-spacing: .02em;
+  --text-label-sm--font-weight: 600;
+  --font-caption: "Plus Jakarta Sans", Arial, sans-serif;
+  --text-caption: 11px;
+  --text-caption--line-height: 14px;
+  --text-caption--letter-spacing: .02em;
+  --text-caption--font-weight: 500;
+}
+.marketing-home { font-family: "Plus Jakarta Sans", Arial, sans-serif; }
+.marketing-home button, .marketing-home input, .marketing-home select { font-family: inherit; }
+.marketing-home button, .marketing-home summary { cursor: pointer; }
+.marketing-home section[id], .marketing-home [id$="form"], #faq-accordion { scroll-margin-top: 100px; }
+.marketing-home :is(a, button, input, select, summary):focus-visible { outline: 3px solid #0050cb; outline-offset: 4px; }
+.marketing-home :is(a, button) { transition: color .2s, background-color .2s, box-shadow .2s, transform .2s; }
+@media (hover: hover) {
+ .marketing-home :is(a, button)[class*="shadow"]:hover { transform: translateY(-3px); box-shadow: 0 10px 24px #0050cb24; }
+ .marketing-home div[class*="rounded-2xl"][class*="shadow"] { transition: transform .25s, box-shadow .25s; }
+ .marketing-home div[class*="rounded-2xl"][class*="shadow"]:hover { transform: translateY(-4px); box-shadow: 0 16px 36px #0b1c3012; }
+}
+.marketing-home .material-symbols-outlined { font-family: "Material Symbols Outlined"; font-weight: normal; font-style: normal; line-height: 1; letter-spacing: normal; text-transform: none; display: inline-block; white-space: nowrap; word-wrap: normal; direction: ltr; font-feature-settings: "liga"; -webkit-font-smoothing: antialiased; flex-shrink: 0; }
+.marketing-home .faq-entry summary { list-style: none; }
+.marketing-home .faq-entry summary::-webkit-details-marker { display: none; }
+.marketing-home .faq-entry[open] summary { color: #0050cb; }
+.marketing-home .faq-entry[open] summary .material-symbols-outlined { transform: rotate(180deg); }
+.marketing-home .mobile-menu-trigger { display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid #dce9ff; border-radius: 10px; background: white; color: #0050cb; }
+.marketing-home .mobile-navigation { position: absolute; top: 80px; left: 16px; right: 16px; padding: 12px; background: white; border: 1px solid #e5eeff; border-radius: 16px; box-shadow: 0 16px 40px #0b1c301a; }
+.marketing-home .mobile-navigation a { display: block; padding: 12px 16px; border-radius: 8px; font-size: 14px; font-weight: 600; }
+.marketing-home .mobile-navigation a:hover { background: #eff4ff; color: #0050cb; }
+@media (min-width: 1280px) { .marketing-header > div { max-width: 1440px; gap: 20px; } .marketing-header nav { gap: 20px; } }
+@media (max-width: 1279px) { .marketing-header > div { gap: 12px; } .marketing-header > div > div:nth-child(2) { margin-left: auto; gap: 10px; } }
+@media (max-width: 639px) {
+ .marketing-home .text-display { font-size: 32px; line-height: 39px; }
+ .marketing-home .text-headline-lg { font-size: 28px; line-height: 36px; }
+ .marketing-home .marketing-header > div { padding-inline: 16px; gap: 8px; }
+ .marketing-home .header-cta { padding: 10px 12px; font-size: 11px; line-height: 16px; max-width: 125px; }
+ .marketing-home .marketing-header > div > div:nth-child(2) > div { display: none; }
+ .marketing-home #home > div:last-child > div:first-child { flex-wrap: wrap; justify-content: center; gap: 8px; border-radius: 16px; }
+ .marketing-home #showcase .h-72 { height: 260px; }
+ .marketing-home .sim-tab { flex: 1 1 40%; }
+ .marketing-home .h-56 { height: auto; min-height: 224px; }
+ .marketing-home h1, .marketing-home h2, .marketing-home h3 { overflow-wrap: break-word; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .marketing-home *, .marketing-home *::before, .marketing-home *::after { animation: none !important; transition: none !important; } }
+
+/* Shared navigation and partner logos for the public pages. */
+.marketing-home .site-header-inner { height: 80px; max-width: 1600px; margin-inline: auto; padding-inline: 24px; display: flex; align-items: center; gap: 24px; }
+.marketing-home .site-desktop-navigation { display: none; flex: 1; justify-content: center; align-items: center; gap: 16px; }
+.marketing-home .site-navigation-link { display: inline-flex; align-items: center; gap: 5px; padding-block: 9px; color: #424656; font-size: 13px; font-weight: 600; white-space: nowrap; }
+.marketing-home .site-navigation-link:hover { color: #0050cb; }
+.marketing-home .site-navigation-active { color: #0050cb; background: #dce9ff; }
+.marketing-home .site-header-actions { display: flex; align-items: center; gap: 16px; margin-left: auto; }
+.marketing-home .site-profile-icon { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; display: grid; place-items: center; color: #fff; background: #0050cb; }
+.marketing-home .site-mobile-menu { display: block; }
+.marketing-home .mobile-navigation { max-height: calc(100dvh - 100px); overflow-y: auto; }
+.marketing-home .partner-banner { width: 100%; padding: 28px 24px; border: 1px solid #e5eeff; border-radius: 24px; background: #fff; box-shadow: 0 2px 5px #0b1c3008; }
+.marketing-home .partner-logo-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); align-items: center; gap: 24px 16px; }
+.marketing-home .partner-logo { min-width: 0; height: 64px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; transition: transform .2s; }
+.marketing-home .partner-logo svg { flex-shrink: 0; }
+.marketing-home .meta-wordmark { font-size: 25px; font-weight: 700; color: #0866ff; letter-spacing: -.04em; }
+.marketing-home .mastercard-wordmark { width: min(100%,160px); height: auto; }
+.marketing-home .iyzads-wordmark { font-size: 26px; font-weight: 700; color: #42b883; letter-spacing: -.04em; }
+.marketing-home .tami-wordmark { position: relative; font-size: 40px; line-height: 1; font-weight: 800; color: #37266b; letter-spacing: -.06em; padding-right: 9px; }
+.marketing-home .tami-dot { position: absolute; width: 7px; height: 7px; border-radius: 50%; background: currentColor; top: 4px; right: -2px; }
+.marketing-home .aws-wordmark { display: flex; flex-direction: column; align-items: center; color: #232f3e; font-size: 35px; font-weight: 800; letter-spacing: -.04em; line-height: 1; }
+.marketing-home .partner-logo-last { grid-column: 1 / -1; }
+.about-page { overflow-x: clip; }
+.about-page section[id] { scroll-margin-top: 100px; }
+@media (hover:hover) { .marketing-home .partner-logo:hover { transform: translateY(-3px); } }
+@media (min-width:768px) { .marketing-home .partner-logo-grid { grid-template-columns: repeat(5,minmax(0,1fr)); gap: 24px; } .marketing-home .partner-logo-last { grid-column: auto; } }
+@media (min-width:1280px) { .marketing-home .site-desktop-navigation { display:flex; } .marketing-home .site-mobile-menu { display:none; } .marketing-home .site-header-inner { padding-inline:48px; } }
+@media (max-width:639px) {
+ .marketing-home .site-header-inner { padding-inline:16px; gap:10px; }
+ .marketing-home .site-header-actions { gap:8px; }
+ .marketing-home .site-profile-icon { display:none; }
+ .marketing-home .partner-banner { padding:24px 16px; }
+ .marketing-home .partner-logo { gap:5px; }
+ .marketing-home .meta-wordmark { font-size:22px; }
+ .marketing-home .partner-logo > svg:first-child:not(.mastercard-wordmark) { width:34px; }
+ .marketing-home .iyzads-wordmark { font-size:22px; }
+ .about-page #about-home h1 { font-size:clamp(24px,7.3vw,34px); line-height:1.14; overflow-wrap:normal; }
+ .about-page #about-home .inline-flex.rounded-full { font-size:10px; }
+ .about-page img.h-\[440px\], .about-page img.h-\[460px\], .about-page img.h-\[520px\] { height:320px; }
+ .about-page section > .max-w-7xl { padding-inline:20px; }
+}
+
+.marketing-home .site-header-logo { flex-shrink: 0; }
+.marketing-home .site-navigation-primary { color: #0066ff; font-weight: 700; }
+.marketing-home .site-navigation-secondary { color: #005cad; font-weight: 700; }
+.marketing-home .site-login-link { color: #424656; font-size: 14px; font-weight: 600; white-space: nowrap; }
+.marketing-home .site-login-link:hover { color: #0050cb; }
+.marketing-home .site-header-cta { display: inline-flex; align-items: center; justify-content: center; padding: 12px 20px; border-radius: 12px; background: #0066ff; color: #fff; font-size: 14px; font-weight: 600; white-space: nowrap; box-shadow: 0 2px 4px #0050cb20; }
+.marketing-home .site-header-cta:hover { background: #0050cb; box-shadow: 0 6px 16px #0050cb26; transform: translateY(-1px); }
+@media (min-width:1360px) { .marketing-home .site-navigation-link { font-size:14px; } }
+@media (max-width:639px) { .marketing-home .site-login-link { display:none; } .marketing-home .site-header-cta { white-space:normal; padding:10px 12px; font-size:11px; line-height:16px; max-width:130px; text-align:center; } }
+
+.marketing-home .mobile-navigation a { display:flex; align-items:center; gap:10px; }
