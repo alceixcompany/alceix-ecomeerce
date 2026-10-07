@@ -1,0 +1,17 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import ts from 'typescript';
+const compile=source=>ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText;
+const url=source=>'data:text/javascript;base64,'+Buffer.from(compile(source)).toString('base64');
+const rules=await import(url(fs.readFileSync(new URL('./administration.ts',import.meta.url),'utf8')));
+const {platformRoutes}=await import(url(fs.readFileSync(new URL('../../../config/platform-routes.ts',import.meta.url),'utf8')));
+const ids=['store:firmaadi','creator:melis'],threads=['creator:melis~heer'],empty={members:[],threads:[],audit:[]};
+const member={accountId:ids[0],status:'review',verified:false,note:'Firma profilini inceleyelim.'};
+test('member actions require a known account and meaningful reason; preserve source records',()=>{assert.throws(()=>rules.setMemberControl(empty,{...member,accountId:'unknown'},'Gerekçe',ids,'1','2026-10-07T10:00:00Z'));assert.throws(()=>rules.setMemberControl(empty,member,'  ',ids,'1','2026-10-07T10:00:00Z'));const next=rules.setMemberControl(empty,member,'Profil incelemesi',ids,'1','2026-10-07T10:00:00Z');assert.equal(next.members[0].status,'review');assert.equal(next.audit[0].target,ids[0]);assert.deepEqual(empty.members,[]);assert.equal(rules.isAdministration(next,ids,threads),true);});
+test('stored administration rejects fabricated accounts, duplicate controls and invalid audit dates',()=>{const valid=rules.setMemberControl(empty,member,'Profil incelemesi',ids,'1','2026-10-07T10:00:00Z');for(const invalid of [{...valid,members:[member,member]},{...valid,members:[{...member,status:'owner'}]},{...valid,members:[{...member,accountId:'store:other'}]},{...valid,audit:[{...valid.audit[0],createdAt:'invalid'}]},{...valid,audit:[null]}])assert.equal(rules.isAdministration(invalid,ids,threads),false);});
+test('conversation review targets an exact known thread and always records a note',()=>{assert.throws(()=>rules.setThreadControl(empty,{threadId:'creator:melis~other',flagged:true,note:'Görüşme notu'},threads,'2','2026-10-07T10:00:00Z'));const result=rules.setThreadControl(empty,{threadId:threads[0],flagged:true,note:'Teslim takvimi incelemesi'},threads,'2','2026-10-07T10:00:00Z');assert.equal(rules.isAdministration(result,ids,threads),true);assert.equal(result.audit[0].target,threads[0]);});
+test('account volumes exclude cancellations without mixing retail and wholesale',()=>{assert.equal(rules.accountVolume({orders:[{status:'delivered',amountCents:9000},{status:'cancelled',amountCents:5000}]}),9000);});
+test('exports quote multiline data and neutralize spreadsheet formula prefixes',()=>{assert.match(rules.csvExport([['=SUM(1,2)','  +malicious','a"b\nc']]),/"'=SUM/);assert.match(rules.csvExport([['  +malicious']]),/"'  \+malicious"/);assert.match(rules.csvExport([['a"b']]),/a""b/);});
+test('filters preserve other parameters and clamp pagination after narrowing',()=>{assert.equal(rules.queryTarget('?q=İstanbul&page=4&status=review','status','all'),'q=%C4%B0stanbul');assert.equal(rules.safePage('99',9),2);assert.equal(rules.safePage('-1',9),1);assert.equal(rules.safePage('1.5',9),1);});
+test('member and thread routes encode opaque IDs without route injection',()=>{assert.equal(platformRoutes.member('creator','melis/other'),'/admin/influencerlar/melis%2Fother');assert.equal(platformRoutes.thread('creator:melis~heer?view=admin'),'/admin/mesajlar/creator%3Amelis~heer%3Fview%3Dadmin');});

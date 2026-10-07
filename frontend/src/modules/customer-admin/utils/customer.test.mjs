@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import ts from 'typescript';
+const source=fs.readFileSync(new URL('./customer.ts',import.meta.url),'utf8');
+const {filterCustomers,matchesSegment,customerCsv,isCrmData,validateCustomer}=await import('data:text/javascript;base64,'+Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString('base64'));
+const customer={id:'demo-1',name:'Işık Yılmaz',email:'demo@example.com',phone:'',city:'İstanbul',orders:2,spentCents:500000,daysSinceOrder:90,joinedDays:31,cartCents:10000,points:5,consent:false,note:''};
+const settings={earnRate:100,pointCents:100,abandonedEnabled:true,delayHours:24,discount:10,template:'Merhaba'};
+test('segments use their exact boundaries and filters combine',()=>{assert.equal(matchesSegment(customer,'vip'),true);assert.equal(matchesSegment(customer,'inactive'),true);assert.equal(matchesSegment(customer,'new'),false);assert.equal(filterCustomers([customer],'vip','ışık','high','inactive').length,1);assert.equal(filterCustomers([customer],'cart','','low','all').length,0);assert.equal(matchesSegment({...customer,orders:0},'inactive'),false);});
+test('CRM snapshots reject duplicate IDs, malformed contacts and invalid settings',()=>{assert.equal(isCrmData({customers:[customer],settings}),true);assert.equal(isCrmData({customers:[customer,customer],settings}),false);assert.equal(isCrmData({customers:[{...customer,spentCents:-1}],settings}),false);assert.equal(isCrmData({customers:[customer],settings:{...settings,discount:51}}),false);assert.notEqual(validateCustomer({...customer,email:'bad'}),'');});
+test('CSV quoting prevents formulas and preserves multiline fields',()=>{const csv=customerCsv([{...customer,name:'=HYPERLINK("bad")',city:'Ankara\nMerkez'}]);assert.ok(csv.startsWith('\ufeff'));assert.ok(csv.includes('"\'=HYPERLINK(""bad"")"'));assert.ok(csv.includes('"Ankara\nMerkez"'));assert.ok(csv.includes('"Yok"'));});

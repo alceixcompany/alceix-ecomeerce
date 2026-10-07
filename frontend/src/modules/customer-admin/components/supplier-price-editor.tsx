@@ -1,0 +1,4 @@
+"use client";
+import {useState} from 'react';
+import {parsePrice} from '../utils/product';
+export function SupplierPriceEditor({name,price,onSave,disabled=false}:{name:string;price:number;onSave:(cents:number)=>boolean;disabled?:boolean}){const [value,setValue]=useState(String(price/100)),[error,setError]=useState('');return <form className="co-price" onSubmit={e=>{e.preventDefault();const cents=parsePrice(value);if(!cents||cents>100000000){setError('₺0 üzeri ve ₺1.000.000 altı bir fiyat yazın.');return;}if(onSave(cents))setError('');else setError('Fiyat kaydedilemedi.');}}><label>{name} · Mağaza satış fiyatı (₺)<input aria-label={`${name} satış fiyatı`} inputMode="decimal" required value={value} onChange={e=>setValue(e.target.value)}/></label><button className="co-secondary" disabled={disabled}>Satış Fiyatını Uygula</button>{error&&<small role="alert">{error}</small>}</form>;}

@@ -9,7 +9,7 @@ export function SiteFooter() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-12">
           <div className="lg:col-span-2 flex flex-col gap-4">
             <div className="flex items-center gap-3">
-              <Image alt="Alceix resmi vektör logosu ve kurumsal unvanı (mavi-siyah geometrik tipografi)" className="h-8 w-auto object-contain" src="/marketing/alceix-logo.webp"  width={512} height={160} priority sizes="100px" />
+              <Image alt="Alceix resmi vektör logosu ve kurumsal unvanı (mavi-siyah geometrik tipografi)" className="h-8 w-auto object-contain" src="/marketing/alceix-logo.webp"  width={512} height={160} sizes="100px" />
             </div>
             <p className="font-body-md text-body-md text-on-surface-variant max-w-sm">
               {"Yeni nesil bulut e-ticaret altyapısı. Komisyonsuz, sıfır maliyetle mağazanızı kurun, pazaryeri ve tedarikçi ağlarıyla tek merkezden dünyaya satın."}
@@ -76,9 +76,9 @@ export function SiteFooter() {
                 </Link>
               </li>
               <li className="">
-                <a className="hover:text-primary transition-colors" href="mailto:destek@alceix.com">
+                <Link className="hover:text-primary transition-colors" href={routes.contact}>
                   {"İletişim & Yardım"}
-                </a>
+                </Link>
               </li>
               <li className="">
                 <Link className="hover:text-primary transition-colors" href={routes.partners}>

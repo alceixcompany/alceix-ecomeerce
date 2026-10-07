@@ -1,0 +1,8 @@
+'use client';
+import {useRef} from 'react';
+import {SupplierIcon} from './supplier-shell';
+export {SupplierIcon as Icon};
+export function PanelHeading({title,description,actions}:{title:string;description:string;actions?:React.ReactNode}){return <div className="sa-page-heading"><div><span className="ad-eyebrow">ALCEIX · TEDARİKÇİ YÖNETİMİ</span><h1>{title}</h1><p>{description}</p></div><div className="sa-actions">{actions}</div></div>;}
+export function Stats({items}:{items:{label:string;value:string;note:string;icon:string}[]}){return <section className="ad-stats">{items.map(i=><article className="ad-card ad-stat" key={i.label}><div className="ad-stat-top"><span className="ad-stat-label">{i.label}</span><span className="ad-icon-box blue"><SupplierIcon name={i.icon}/></span></div><strong className="ad-stat-value">{i.value}</strong><p>{i.note}</p></article>)}</section>;}
+export function PanelDialog({title,trigger,children}:{title:string;trigger:React.ReactNode;children:(close:()=>void)=>React.ReactNode}){const ref=useRef<HTMLDialogElement>(null);return <><button className="ad-button light" onClick={()=>ref.current?.showModal()}>{trigger}</button><dialog ref={ref} className="ad-dialog" aria-label={title}><div className="ad-dialog-heading"><h2>{title}</h2><button autoFocus aria-label="Pencereyi kapat" onClick={()=>ref.current?.close()}>×</button></div>{children(()=>ref.current?.close())}</dialog></>;}
+export function downloadCsv(name:string,rows:string){const url=URL.createObjectURL(new Blob(['\uFEFF'+rows],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}

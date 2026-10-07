@@ -1,0 +1,17 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import ts from 'typescript';
+const productUtils=ts.transpileModule(fs.readFileSync(new URL('../../admin-editors/utils/product.ts',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText;
+const productUri='data:text/javascript;base64,'+Buffer.from(productUtils).toString('base64');
+const load=async path=>import('data:text/javascript;base64,'+Buffer.from(ts.transpileModule(fs.readFileSync(new URL(path,import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText.replaceAll('@/modules/admin-editors',productUri)).toString('base64'));
+const {createWholesaleOrder,canSellToStore,isSupplierWorkspace,cancelWholesaleOrder}=await load('./workspace.ts');
+const {createSupplierWorkspace,supplierCompanies}=await load('../mocks/workspace.ts');
+const workspace=()=>createSupplierWorkspace(supplierCompanies[0]);
+test('only active connected Alceix stores may buy',()=>{const w=workspace();assert.equal(canSellToStore(w.stores,'heer'),true);assert.throws(()=>createWholesaleOrder(w,'outside-consumer','knit-01',1,'new'));w.stores[0].active=false;assert.throws(()=>createWholesaleOrder(w,'heer','knit-01',1,'new'));});
+test('order snapshots wholesale price and enforces stock, minimum and publication',()=>{const w=workspace();const order=createWholesaleOrder(w,'heer','knit-01',2,'new');assert.equal(order.unitCostCents,32000);assert.equal(order.quantity,2);assert.equal(w.products[0].stock,84);w.products[0].costCents=40000;assert.equal(order.unitCostCents,32000);for(const quantity of [0,1.5,85,-1])assert.throws(()=>createWholesaleOrder(w,'heer','knit-01',quantity,'bad'));assert.throws(()=>createWholesaleOrder(w,'heer','knit-04',2,'bad'));w.products[0].minimum=3;assert.throws(()=>createWholesaleOrder(w,'heer','knit-01',2,'bad'));});
+test('persisted demo validates shapes, money and buyer relationships',()=>{const w=workspace();assert.equal(isSupplierWorkspace(w),true);assert.equal(isSupplierWorkspace(null),false);for(const key of ['products','stores','orders','messages'])assert.equal(isSupplierWorkspace({...w,[key]:[{}]}),false);assert.equal(isSupplierWorkspace({...w,products:[{...w.products[0],costCents:-1}]}),false);assert.equal(isSupplierWorkspace({...w,orders:[{...w.orders[0],buyerStoreId:'consumer'}]}),false);assert.equal(isSupplierWorkspace({...w,messages:[{...w.messages[0],storeId:'outside'}]}),false);});
+test('supplier workspaces do not share mutable data',()=>{const a=createSupplierWorkspace(supplierCompanies[0]),b=createSupplierWorkspace(supplierCompanies[1]);a.products[0].stock=1;a.messages.push({id:'new',storeId:'heer',text:'demo',author:'supplier'});assert.equal(b.products[0].stock,84);assert.equal(b.messages.length,2);});
+
+test('cancellation restores stock exactly once and preserves price snapshot',()=>{const w=workspace();const next=cancelWholesaleOrder(w,'B2B-1042');assert.equal(next.products[0].stock,w.products[0].stock+2);assert.equal(next.orders[0].status,'cancelled');assert.equal(isSupplierWorkspace(next),true);assert.throws(()=>cancelWholesaleOrder(next,'B2B-1042'));assert.throws(()=>cancelWholesaleOrder(w,'B2B-1041'));});
+test('rich product information remains optional for old saved workspaces',()=>{const w=workspace();assert.equal(isSupplierWorkspace(w),true);w.products[0].details={};assert.equal(isSupplierWorkspace(w),false);});

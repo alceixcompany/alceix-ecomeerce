@@ -1,0 +1,7 @@
+import type {Profile,TeamMember,OpenCampaign} from '../types/collaboration';
+export const initialProfile:Profile={name:'Ceyda A.',email:'ceyda@example.com',phone:'',city:'İstanbul',bio:'Mağazamın ürün ve operasyon süreçlerini yönetiyorum.'};
+export const initialTeam:TeamMember[]=[{id:'owner',name:'Ceyda A.',email:'ceyda@example.com',role:'owner',status:'active'}];
+export const roleLabels={owner:'Mağaza Sahibi',editor:'Ürün & Operasyon',support:'Müşteri Desteği',viewer:'Görüntüleyici'};
+export const demoOpenCampaigns:OpenCampaign[]=[{id:'OPEN-1001',title:'Sonbahar koleksiyonunu birlikte tanıtalım',brief:'Günlük kombin içinde ürün deneyimini anlatan bir Reels ve iki Story. İçerik yayınından önce mağaza onayı alınacak.',format:'Reels + Story',budgetCents:2000000,deadline:'2026-11-15',slots:2,status:'open',applications:[{creatorId:'melis',status:'new',note:'Kapsül gardırop serimde koleksiyonunuza yer vermek istiyorum.'},{creatorId:'caner',status:'new',note:'Ürünü günlük kombin ve detay çekimleri ile anlatabilirim.'},{creatorId:'zeynep',status:'new',note:'Takipçilerime kullanım deneyimini samimi bir video ile aktarabilirim.'}]}];
+
+export const demoSupplierReviews=[{storeName:'Doku Mağaza · Örnek',rating:5,text:'Ürünleri mağazama ekledikten sonra stok ve paketleme bilgileriyle satış planımı daha rahat hazırladım.',createdAt:'2026-09-28T10:00:00Z'},{storeName:'Minimal Seçki · Örnek',rating:4,text:'Koleksiyon görselleri kullanışlı; farklı bedenler için daha fazla ürün detayı görmek isterim.',createdAt:'2026-09-30T10:00:00Z'}];

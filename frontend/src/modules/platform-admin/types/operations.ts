@@ -1,0 +1,10 @@
+export type PageKey='overview'|'members'|'sales'|'works'|'messages'|'audit'|'team'|'smtp'|'sms'|'email'|'support'|'live'|'finance'|'reviews'|'referrals';
+export type StaffRole='owner'|'operations'|'support'|'finance'|'marketing'|'custom';
+export type Staff={id:string;name:string;email:string;role:StaffRole;status:'active'|'invited'|'paused';pages:PageKey[];write:boolean};
+export type SmtpSettings={host:string;port:number;security:'tls'|'starttls';fromName:string;fromEmail:string;replyTo:string;username:string};
+export type Broadcast={id:string;channel:'email'|'sms';title:string;body:string;recipients:string[];status:'draft'|'queued'|'cancelled';createdAt:string;consent:boolean};
+export type TicketReview={ticketId:string;status:'open'|'waiting'|'resolved';assignee:string;priority:'normal'|'high';note:string;replies:{id:string;sender:string;body:string}[]};
+export type LiveSession={id:string;name:string;source:'store'|'supplier'|'creator'|'buyer';subject:string;status:'waiting'|'active'|'closed';assignee:string;messages:{id:string;sender:string;body:string}[]};
+export type Payout={id:string;accountId:string;amountCents:number;status:'pending'|'approved'|'recorded';reference:string;createdAt:string};
+export type OperationEvent={id:string;actor:string;action:string;createdAt:string};
+export type Operations={staff:Staff[];smtp:SmtpSettings;smsSender:string;broadcasts:Broadcast[];ticketReviews:TicketReview[];live:LiveSession[];payouts:Payout[];events:OperationEvent[]};

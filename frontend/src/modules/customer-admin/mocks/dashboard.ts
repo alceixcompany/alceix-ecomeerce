@@ -1,4 +1,4 @@
-export type AdminStore = { name: string; initials: string; slug: string; storefrontSlug: string };
+export type AdminStore = { name: string; initials: string; slug: string; storefrontSlug: string; isOpen?: boolean; mode?: "normal" | "maintenance" | "holiday"; account?: {name:string;email:string} };
 export function getAdminStore(slug: string): AdminStore | undefined {
   if (!["firmaadi", "magazaadi", "luma-studio"].includes(slug)) return undefined;
   return { name: slug === "firmaadi" ? "Heer Atelier" : "Luma Studio", initials: slug === "firmaadi" ? "HA" : "LS", slug, storefrontSlug: "luma-studio" };

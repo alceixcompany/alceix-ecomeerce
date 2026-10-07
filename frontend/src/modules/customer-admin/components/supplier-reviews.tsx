@@ -1,0 +1,17 @@
+"use client";
+import {useEffect,useState} from 'react';
+import type {AdminStore} from '../mocks/dashboard';
+import type {Supplier} from '../types/supplier';
+import type {SupplierReview} from '../types/collaboration';
+import {useWorkspaceRecord} from '../hooks/use-workspace-record';
+import {demoSupplierReviews} from '../mocks/collaboration';
+import {isReviews,isConnections} from '../utils/collaboration';
+const emptyReviews:SupplierReview[]=[],emptyConnections:string[]=[];
+export function SupplierReviews({store,supplier,imported}:{store:AdminStore;supplier:Supplier;imported:boolean}){
+ const reviews=useWorkspaceRecord(`alceix:supplier-reviews:${store.slug}`,emptyReviews,isReviews),connections=useWorkspaceRecord(`alceix:supplier-connections:${store.slug}`,emptyConnections,isConnections);
+ const own=reviews.value.find(r=>r.supplierId===supplier.id),connected=imported||connections.value.includes(supplier.id);
+ const [rating,setRating]=useState(5),[text,setText]=useState(''),[notice,setNotice]=useState('');
+ useEffect(()=>{setRating(own?.rating||5);setText(own?.text||'');},[own]);
+ const display=[...demoSupplierReviews,...(own?[own]:[])];
+ return <section className="co-card" style={{marginTop:24}}><header className="co-heading"><div><span className="co-eyebrow">BAĞLI MAĞAZALARIN DENEYİMLERİ</span><h2>Tedarikçi Yorumları & Puanları</h2><p>Yalnızca tedarikçiyi mağazasına bağlayan mağazalar değerlendirme ekleyebilir.</p></div><div className="co-summary"><strong>★ {(display.reduce((s,r)=>s+r.rating,0)/display.length).toFixed(1)} / 5</strong><small>{display.length} demo değerlendirme</small></div></header><div className="co-grid"><div>{display.map((r,i)=><article className="co-row" key={i}><div><span className="co-stars">{'★'.repeat(r.rating)}{'☆'.repeat(5-r.rating)}</span><strong>{r.storeName}</strong><p className="co-muted">{r.text}</p><small>{new Date(r.createdAt).toLocaleDateString('tr-TR')} · Bağlı mağaza (Demo)</small></div></article>)}</div><div><h2>{own?'Değerlendirmemi Düzenle':'Deneyiminizi Paylaşın'}</h2>{connected?<form className="co-form" onSubmit={e=>{e.preventDefault();const review:SupplierReview={supplierId:supplier.id,storeName:store.name,rating,text:text.trim(),createdAt:new Date().toISOString()};if(reviews.save([...reviews.value.filter(r=>r.supplierId!==supplier.id),review]))setNotice('Değerlendirmeniz yerel demoda kaydedildi.');}}><label>Tedarikçi puanınız<select value={rating} onChange={e=>setRating(Number(e.target.value))}>{[5,4,3,2,1].map(n=><option key={n} value={n}>{n} / 5</option>)}</select></label><label>Yorumunuz<textarea required rows={4} maxLength={1000} value={text} onChange={e=>setText(e.target.value)}/></label><button className="ad-button" disabled={!reviews.ready}>{own?'Değerlendirmeyi Güncelle':'Değerlendirme Ekle'}</button></form>:<><p className="co-muted">Henüz bu tedarikçiyle bağlantınız yok. Bir ürün aktarın veya demo bağlantıyı başlatın.</p><button className="ad-button" disabled={!connections.ready} onClick={()=>{if(connections.save([...connections.value,supplier.id]))setNotice('Yerel demo bağlantısı kuruldu. Gerçek tedarik sözleşmesi oluşturulmadı.');}}>Mağazama Bağla (Demo)</button></>}{(reviews.error||connections.error)&&<p className="co-error" role="alert">{reviews.error||connections.error}</p>}{notice&&<p className="co-success" role="status">{notice}</p>}<div className="co-demo">Bağlantı ve yorum uygunluğu bu demoda yerel kayıttan kontrol edilir. Gerçek bağlantı doğrulaması ve ortak yorum havuzu sunucuda uygulanmalıdır.</div></div></div></section>;
+}
