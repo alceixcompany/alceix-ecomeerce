@@ -1,0 +1,15 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import ts from 'typescript';
+const source=fs.readFileSync(new URL('./influencer.ts',import.meta.url),'utf8');
+const {campaignIssue,filterCreators,isCampaigns,nextCampaignStatus,csvCell}=await import('data:text/javascript;base64,'+Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString('base64'));
+const campaign={id:'CMP-1',creatorId:'a',name:'Sonbahar',kind:'paid',productId:'p',quantity:1,fee:10000,commission:10,brief:'Ürün videosu',status:'pending',createdAt:'2026-10-02T10:00:00Z'};
+test('campaign validates quantity, money and commission boundaries',()=>{assert.equal(campaignIssue(campaign),'');for(const invalid of [{quantity:0},{quantity:1.5},{fee:-1},{fee:10000001},{commission:31},{brief:'  '},{kind:'gift',fee:100}])assert.notEqual(campaignIssue({...campaign,...invalid}),'');});
+test('stored campaigns reject duplicates and unknown references',()=>{assert.equal(isCampaigns([campaign],['a'],['p']),true);assert.equal(isCampaigns([campaign,campaign],['a'],['p']),false);assert.equal(isCampaigns([campaign],['b'],['p']),false);assert.equal(isCampaigns([{...campaign,status:'invalid'}],['a'],['p']),false);});
+test('campaign lifecycle stops at final states',()=>{assert.equal(nextCampaignStatus('pending'),'approved');assert.equal(nextCampaignStatus('approved'),'shipped');assert.equal(nextCampaignStatus('shipped'),'completed');assert.equal(nextCampaignStatus('completed'),undefined);assert.equal(nextCampaignStatus('cancelled'),undefined);});
+test('Turkish search and compound creator filters',()=>{const creators=[{name:'Işık',handle:'@isik',description:'Giyim',platform:'Instagram',category:'Moda',audience:'Kadın',followers:100000,fee:0,engagement:3},{name:'Can',handle:'@can',description:'Teknoloji',platform:'TikTok',category:'Teknoloji',audience:'Erkek',followers:300000,fee:10000,engagement:8}];assert.equal(filterCreators(creators,{q:'ışık',kind:'gift',followers:'micro'}).length,1);assert.equal(filterCreators(creators,{platform:'Instagram',audience:'Erkek'}).length,0);assert.equal(filterCreators(creators,{sort:'engagement'})[0].name,'Can');});
+test('CSV cells quote delimiters and neutralize formulas',()=>{assert.equal(csvCell('=SUM(1,2)'),`"'=SUM(1,2)"`);assert.equal(csvCell('a"b'),'"a""b"');});
+const routesSource=fs.readFileSync(new URL('../../../config/store-routes.ts',import.meta.url),'utf8');
+const {storeRoutes}=await import('data:text/javascript;base64,'+Buffer.from(ts.transpileModule(routesSource,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString('base64'));
+test('creator routes encode segments and offer queries without injecting parameters',()=>{assert.equal(storeRoutes.creator('a/b','x?y'),'/a%2Fb/admin/influencer/x%3Fy');const offer=new URL(storeRoutes.influencerOffer('firmaadi','melis&offer=0'),'https://example.test');assert.equal(offer.searchParams.get('creator'),'melis&offer=0');assert.equal(offer.searchParams.get('offer'),'1');});

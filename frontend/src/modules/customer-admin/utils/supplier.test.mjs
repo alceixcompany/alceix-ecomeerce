@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import ts from 'typescript';
+const source=fs.readFileSync(new URL('./supplier.ts',import.meta.url),'utf8');
+const {supplierPricing,mergeSupplierProducts,importSupplierProduct,isSupplierSettings,validSupplierEndpoint}=await import('data:text/javascript;base64,'+Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString('base64'));
+const product={id:'urun-1',supplierId:'demo',name:'Hırka',category:'Giyim',description:'Demo',sku:'DEMO-1',costCents:32000,stock:80,sizes:['S','M'],colors:['Krem','Bej'],images:['/dropshipping/cardigan.jpg'],material:'Pamuk',weight:'450 g'};
+const settings={markup:100,packaging:true,protocol:'api',endpoint:'https://example.com/catalog',autoSync:false,interval:60};
+test('price addition and platform share stay in integer cents',()=>{assert.deepEqual(supplierPricing(32000,100),{price:64000,commission:1920,net:30080});assert.equal(Number.isInteger(supplierPricing(19999,35).net),true);});
+test('import preserves stock, images and every variant without mutating supplier data',()=>{const result=importSupplierProduct(product,settings,'draft');assert.equal(result.status,'draft');assert.equal(result.model,'supplier');assert.equal(result.priceCents,64000);assert.equal(result.variants.length,4);result.images.push('test');assert.equal(product.images.length,1);});
+test('catalog merging prevents duplicate product IDs and conflicting SKUs',()=>{const result=importSupplierProduct(product,settings,'draft');assert.equal(mergeSupplierProducts([result],[result]).length,1);assert.equal(mergeSupplierProducts([result],[{...result,id:'new'}]).length,1);assert.equal(mergeSupplierProducts([],[result,result]).length,1);});
+test('integration preferences reject credentials and invalid ranges',()=>{assert.equal(isSupplierSettings(settings),true);assert.equal(validSupplierEndpoint('http://example.com'),false);assert.equal(validSupplierEndpoint('https://user:secret@example.com'),false);assert.equal(isSupplierSettings({...settings,markup:301}),false);assert.equal(isSupplierSettings({...settings,interval:0}),false);});
+test('custom sale price reaches the imported catalog and recalculates platform commission',()=>{assert.deepEqual(supplierPricing(32000,100,79500),{price:79500,commission:2385,net:45115});assert.equal(importSupplierProduct(product,settings,'draft',79500).priceCents,79500);});

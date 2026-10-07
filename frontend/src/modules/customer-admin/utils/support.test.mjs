@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import ts from 'typescript';
+const source=fs.readFileSync(new URL('./support.ts',import.meta.url),'utf8');
+const {canReply,filterSupportTickets,isSupportTickets,attachmentIssue,isSupportAttachment}=await import('data:text/javascript;base64,'+Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString('base64'));
+const ticket={id:'TK-1',channel:'platform',category:'API',subject:'İletişim sorunu',priority:'high',status:'open',requester:'Işık',createdAt:'2026-10-02T10:00:00Z',messages:[{id:'m1',author:'merchant',name:'Ceyda',text:'Yardım',createdAt:'2026-10-02T10:00:00Z',attachments:[]}]};
+test('channel, priority and Turkish search combine without crossing channels',()=>{assert.equal(filterSupportTickets([ticket],'platform','ışık','high','open').length,1);assert.equal(filterSupportTickets([ticket],'customer','','all','all').length,0);});
+test('resolved tickets cannot receive replies, blank replies need an attachment',()=>{assert.equal(canReply(ticket,'  ',0),false);assert.equal(canReply(ticket,'',1),true);assert.equal(canReply({...ticket,status:'resolved'},'Yanıt',0),false);assert.equal(canReply(ticket,'x'.repeat(4001),0),false);});
+test('attachments reject executable formats, oversized files and mismatched data',()=>{assert.notEqual(attachmentIssue('text/html',30),'');assert.notEqual(attachmentIssue('application/pdf',3*1024*1024),'');const a={id:'a1',name:'note.txt',size:3,mime:'text/plain',data:'data:text/plain;base64,YWJj'};assert.equal(isSupportAttachment(a),true);assert.equal(isSupportAttachment({...a,data:'data:text/html;base64,YWJj'}),false);});
+test('stored tickets reject duplicates, unknown statuses and unsafe attachments',()=>{assert.equal(isSupportTickets([ticket]),true);assert.equal(isSupportTickets([ticket,ticket]),false);assert.equal(isSupportTickets([{...ticket,status:'invalid'}]),false);assert.equal(isSupportTickets([{...ticket,messages:[{...ticket.messages[0],attachments:[{}]}]}]),false);});

@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import ts from 'typescript';
+const load=async path=>import('data:text/javascript;base64,'+Buffer.from(ts.transpileModule(fs.readFileSync(new URL(path,import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString('base64'));
+const {isSupplierTools,inviteSupplierMember,internalMessageIssue,csvCell}=await load('./tools.ts');
+const {initialSupplierTools}=await load('../mocks/tools.ts');
+test('tools validate persisted records and unsafe gallery assets',()=>{const t=initialSupplierTools();assert.equal(isSupplierTools(t),true);assert.equal(isSupplierTools({...t,credits:-8}),false);assert.equal(isSupplierTools({...t,credits:1.5}),false);assert.equal(isSupplierTools({...t,members:[]}),false);assert.equal(isSupplierTools({...t,tickets:[{...t.tickets[0],messages:[{id:'x',author:'hacker',text:'a'}]}]}),false);assert.equal(isSupplierTools({...t,gallery:[{id:'x',productId:'p',name:'n',image:'https://outside.example/asset.jpg',scene:'studio',mode:'model'}]}),false);});
+test('invitations normalize email and refuse duplicate members and owner assignment',()=>{const t=initialSupplierTools();const m=inviteSupplierMember(t.members,'  EKIP@example.com ','operations','new');assert.equal(m.email,'ekip@example.com');assert.equal(m.status,'invited');assert.throws(()=>inviteSupplierMember([...t.members,m],'ekip@example.com','viewer','dup'));assert.throws(()=>inviteSupplierMember(t.members,'invalid','support','bad'));assert.throws(()=>inviteSupplierMember(t.members,'ekip@example.com','owner','bad'));assert.equal(t.members.length,1);});
+test('platform conversations reject external contact information',()=>{assert.equal(internalMessageIssue('Sipariş stok bilgisini paylaşabilir misiniz?'),'');for(const value of ['', 'https://outside.example','test@example.com','0532 123 45 67','a'.repeat(2001)])assert.ok(internalMessageIssue(value));});
+test('exports escape quotes and spreadsheet formulas',()=>{assert.equal(csvCell('=SUM(1,2)'), '"\'=SUM(1,2)"');assert.equal(csvCell('a"b'),'"a""b"');assert.equal(csvCell(320),'"320"');});

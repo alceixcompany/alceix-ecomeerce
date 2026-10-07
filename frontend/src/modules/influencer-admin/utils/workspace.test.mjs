@@ -1,0 +1,21 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import ts from 'typescript';
+const load=async (path,replace=s=>s)=>import('data:text/javascript;base64,'+Buffer.from(ts.transpileModule(replace(fs.readFileSync(new URL(path,import.meta.url),'utf8')),{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString('base64'));
+const {transition,validContentUrl,messageIssue,isCreatorWorkspace,validDate}=await load('./workspace.ts');
+const {isPublishedCreator,creatorProfileKey}=await load('../../creator-directory/utils/profile.ts');
+const {creators}=await load('../../creator-directory/mocks/creators.ts');
+const {creatorPortfolios}=await load('../../creator-directory/mocks/portfolios.ts');
+const base={id:'ISB-1',brandId:'heer',title:'İş birliği',direction:'incoming',status:'pending',kind:'paid',feeCents:850000,brief:'Doğal ürün videosu',deliverables:'1 Reels',deadline:'2026-11-10',createdAt:'2026-10-05T10:00:00Z',product:'Triko',image:'/dropshipping/cardigan.jpg',shipment:'none',tracking:'',contentUrl:'',report:''};
+const profile={creator:creators[0],portfolio:creatorPortfolios[creators[0].id],isAvailable:true};
+const workspace={profile,collaborations:[base],messages:[]};
+test('shared creator profiles validate seed data for every known account',()=>{for(const c of creators)assert.equal(isPublishedCreator({creator:c,portfolio:creatorPortfolios[c.id],isAvailable:true},c.id),true,c.id);});
+test('received acceptance starts preparation and only outgoing offers may withdraw',()=>{assert.equal(transition(base,'active').shipment,'preparing');assert.throws(()=>transition(base,'withdrawn'));assert.equal(transition({...base,direction:'outgoing'},'withdrawn').status,'withdrawn');assert.throws(()=>transition({...base,direction:'outgoing'},'active'));});
+test('delivery requires a trusted social URL and substantive report; final states stay final',()=>{assert.throws(()=>transition({...base,status:'active'},'submitted'));const submitted=transition({...base,status:'active',contentUrl:'https://www.instagram.com/reel/test',report:'Örnek görüntüleme ve erişim raporu'},'submitted');assert.equal(submitted.status,'submitted');const done=transition(submitted,'completed');assert.throws(()=>transition(done,'active'));});
+test('social content validation rejects executable URLs and deceptive hosts',()=>{for(const v of ['javascript:alert(1)','http://instagram.com/reel/a','https://instagram.com.evil.test/a','https://name:password@instagram.com/a'])assert.equal(validContentUrl(v),false);assert.equal(validContentUrl('https://youtu.be/test'),true);});
+test('storage rejects account crossing, negative money, duplicate jobs and unknown partners',()=>{assert.equal(isCreatorWorkspace(workspace,profile.creator.id,isPublishedCreator,['heer']),true);assert.equal(isCreatorWorkspace(workspace,'different',isPublishedCreator,['heer']),false);for(const job of [{...base,feeCents:-1},{...base,kind:'gift'},{...base,brandId:'other'}])assert.equal(isCreatorWorkspace({...workspace,collaborations:[job]},profile.creator.id,isPublishedCreator,['heer']),false);assert.equal(isCreatorWorkspace({...workspace,collaborations:[base,base]},profile.creator.id,isPublishedCreator,['heer']),false);});
+test('profile records reject unsafe artwork and out of range audience statistics',()=>{assert.equal(isPublishedCreator({...profile,creator:{...profile.creator,photo:'https://evil.test/a.jpg'}},profile.creator.id),false);assert.equal(isPublishedCreator({...profile,creator:{...profile.creator,engagement:101}},profile.creator.id),false);assert.notEqual(creatorProfileKey('melis'),creatorProfileKey('caner'));});
+test('internal chat prevents moving commercial contact outside Alceix',()=>{assert.equal(messageIssue('Brief ve teslim tarihi hakkında görüşelim.'),'');for(const body of ['mail@example.com','https://outside.test','0532 123 45 67','a'])assert.notEqual(messageIssue(body),'');});
+
+test('deadline rejects calendar overflow and malformed dates',()=>{assert.equal(validDate('2026-02-30'),false);assert.equal(validDate('2026-13-10'),false);assert.equal(validDate('2026-11-10'),true);});

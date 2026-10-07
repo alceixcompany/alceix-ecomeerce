@@ -12,6 +12,7 @@ export const routes = {
   faq: "/sss",
   login: "/giris-yap",
   register: "/kayit-ol",
+  forgotPassword: "/sifremi-unuttum",
   blog: "/blog",
   contact: "/iletisim",
 } as const;

@@ -1,0 +1,2 @@
+const base=(id:string)=>`/influencer/${encodeURIComponent(id)}/admin`;
+export const influencerRoutes={dashboard:base,offers:(id:string)=>`${base(id)}/teklifler`,offer:(id:string,offer:string)=>`${base(id)}/teklifler/${encodeURIComponent(offer)}`,history:(id:string)=>`${base(id)}/gecmis`,shipments:(id:string)=>`${base(id)}/kargo`,profile:(id:string)=>`${base(id)}/profil`,preview:(id:string)=>`${base(id)}/portfoy`,messages:(id:string)=>`${base(id)}/mesajlar`,reviews:(id:string)=>`${base(id)}/degerlendirmeler`};

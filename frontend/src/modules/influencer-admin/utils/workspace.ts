@@ -1,0 +1,15 @@
+import type {Collaboration,CreatorWorkspace} from '../types/workspace';
+export function validDate(value:unknown){return typeof value==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(value)&&Number.isFinite(Date.parse(value))&&new Date(value).toISOString().slice(0,10)===value;}
+export function isCreatorWorkspace(value:unknown,creatorId:string,validateProfile:(v:unknown,id:string)=>boolean,brandIds:string[]):value is CreatorWorkspace {
+ if(!value||typeof value!=='object')return false;const w=value as CreatorWorkspace;
+ const text=(s:unknown,n:number)=>typeof s==='string'&&s.length<=n;
+ return validateProfile(w.profile,creatorId)&&Array.isArray(w.collaborations)&&w.collaborations.length<=200&&new Set(w.collaborations.map(c=>c?.id)).size===w.collaborations.length&&w.collaborations.every(c=>c&&text(c.id,80)&&brandIds.includes(c.brandId)&&text(c.title,150)&&['incoming','outgoing'].includes(c.direction)&&['pending','active','submitted','completed','rejected','withdrawn'].includes(c.status)&&['paid','gift'].includes(c.kind)&&Number.isSafeInteger(c.feeCents)&&c.feeCents>=0&&c.feeCents<=100000000&&(c.kind!=='paid'||c.feeCents>=100)&&(c.kind!=='gift'||c.feeCents===0)&&text(c.brief,2000)&&text(c.deliverables,300)&&validDate(c.deadline)&&Number.isFinite(Date.parse(c.createdAt))&&text(c.product,150)&&/^\/dropshipping\/[a-zA-Z0-9-]+\.(jpg|png|webp)$/.test(c.image)&&['none','preparing','shipped','delivered'].includes(c.shipment)&&text(c.tracking,100)&&text(c.contentUrl,500)&&(c.contentUrl===''||validContentUrl(c.contentUrl))&&text(c.report,2000))&&Array.isArray(w.messages)&&w.messages.length<=500&&w.messages.every(m=>m&&text(m.id,80)&&brandIds.includes(m.brandId)&&text(m.body,2000)&&['creator','brand'].includes(m.author));
+}
+export function validContentUrl(value:string){try{const u=new URL(value);return u.protocol==='https:'&&['instagram.com','www.instagram.com','tiktok.com','www.tiktok.com','youtube.com','www.youtube.com','youtu.be','twitch.tv','www.twitch.tv'].includes(u.hostname)&&!u.username&&!u.password;}catch{return false;}}
+export function transition(c:Collaboration,next:Collaboration['status']):Collaboration {
+ const allowed=c.status==='pending'?(c.direction==='incoming'?['active','rejected']:['withdrawn']):c.status==='active'?['submitted']:c.status==='submitted'?['completed']:[];
+ if(!allowed.includes(next))throw new Error('Bu iş birliği durumunda işlem kullanılamaz.');
+ if(next==='submitted'&&(!validContentUrl(c.contentUrl)||c.report.trim().length<10))throw new Error('Geçerli sosyal içerik bağlantısı ve en az 10 karakterlik teslim raporu girin.');
+ return {...c,status:next,shipment:next==='active'&&c.product&&c.shipment==='none'?'preparing':c.shipment};
+}
+export function messageIssue(body:string){if(body.trim().length<2||body.length>2000)return '2–2000 karakter arasında mesaj yazın.';if(/https?:\/\/|www\.|[\w.-]+@[\w.-]+\.[a-z]{2,}|(?:\+?90\s*)?0?5\d{2}[\s()-]*\d{3}[\s()-]*\d{2}[\s()-]*\d{2}/i.test(body))return 'Ticari görüşmeler Alceix içinde sürdürülür; harici iletişim bilgisi paylaşmayın.';return '';}

@@ -1,0 +1,12 @@
+import type {SupplierTools,SupplierMember,SupplierRole} from '../types/tools';
+const roles=['owner','operations','finance','support','viewer'];
+const asset=/^\/(dropshipping|storefront\/gallery)\/[a-zA-Z0-9-]+\.(jpg|png|webp)$/;
+const record=(v:unknown):v is Record<string,unknown>=>!!v&&typeof v==='object';
+const text=(v:unknown,max=2000):v is string=>typeof v==='string'&&v.length<=max;
+export function isSupplierTools(v:unknown):v is SupplierTools {if(!record(v)||!Number.isSafeInteger(v.credits)||Number(v.credits)<0||Number(v.credits)>10000||typeof v.automaticPayout!=='boolean'||!text(v.carrier,80))return false;
+ if(!Array.isArray(v.members)||v.members.length>100||!v.members.every(m=>record(m)&&text(m.id,80)&&text(m.name,120)&&text(m.email,254)&&roles.includes(String(m.role))&&['active','invited','paused'].includes(String(m.status)))||v.members.filter(m=>m.role==='owner').length!==1)return false;
+ if(!Array.isArray(v.tickets)||v.tickets.length>100||!v.tickets.every(t=>record(t)&&text(t.id,80)&&text(t.subject,120)&&text(t.category,80)&&['normal','high'].includes(String(t.priority))&&['open','closed'].includes(String(t.status))&&Array.isArray(t.messages)&&t.messages.length<=200&&t.messages.every(m=>record(m)&&text(m.id,80)&&text(m.text)&&['supplier','support'].includes(String(m.author)))))return false;
+ return Array.isArray(v.gallery)&&v.gallery.length<=100&&v.gallery.every(g=>record(g)&&text(g.id,80)&&text(g.productId,120)&&text(g.name,120)&&text(g.image,200)&&asset.test(g.image)&&text(g.scene,80)&&text(g.mode,80));}
+export function inviteSupplierMember(members:SupplierMember[],email:string,role:SupplierRole,id:string):SupplierMember {const normalized=email.trim().toLowerCase();if(members.length>=100||!/^\S+@\S+\.\S+$/.test(normalized)||normalized.length>254||!roles.includes(role)||role==='owner'||members.some(m=>m.email.toLowerCase()===normalized))throw new Error('Geçerli, farklı bir e-posta ve ekip görevi seçin.');return {id,email:normalized,name:normalized.split('@')[0],role,status:'invited'};}
+export function internalMessageIssue(value:string){if(!value.trim()||value.length>2000)return 'Mesajınız 1–2000 karakter olmalı.';if(/https?:\/\/|www\.|\S+@\S+\.\S+|(?:\+?90[\s-]*)?0?5\d{2}[\s()-]*\d{3}[\s-]*\d{2}[\s-]*\d{2}/i.test(value))return 'Görüşmeyi Alceix içinde sürdürün; harici bağlantı, e-posta veya telefon paylaşmayın.';return '';}
+export function csvCell(value:string|number){const s=String(value);return '"'+(/^[=+@-]/.test(s)?"'"+s:s).replaceAll('"','""')+'"';}

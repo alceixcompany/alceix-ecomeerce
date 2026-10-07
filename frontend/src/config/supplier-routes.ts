@@ -1,0 +1,15 @@
+export const supplierRoutes = {
+  dashboard: (slug: string) => `/tedarikci/${encodeURIComponent(slug)}/admin`,
+  products: (slug: string) => `/tedarikci/${encodeURIComponent(slug)}/admin/urunler`,
+  order: (slug:string,orderId:string) => `/tedarikci/${encodeURIComponent(slug)}/admin/siparisler/${encodeURIComponent(orderId)}`,
+  reviews: (slug:string) => `/tedarikci/${encodeURIComponent(slug)}/admin/degerlendirmeler`,
+  orders: (slug: string) => `/tedarikci/${encodeURIComponent(slug)}/admin/siparisler`,
+  stores: (slug: string) => `/tedarikci/${encodeURIComponent(slug)}/admin/magazalar`,
+  finance: (slug: string) => `/tedarikci/${encodeURIComponent(slug)}/admin/finans`,
+  messages: (slug: string) => `/tedarikci/${encodeURIComponent(slug)}/admin/mesajlar`,
+  settings: (slug: string) => `/tedarikci/${encodeURIComponent(slug)}/admin/ayarlar`,
+  api: (slug: string) => `/tedarikci/${encodeURIComponent(slug)}/admin/entegrasyon`,
+  support: (slug: string) => `/tedarikci/${encodeURIComponent(slug)}/admin/destek`,
+  studio: (slug: string) => `/tedarikci/${encodeURIComponent(slug)}/admin/studyo`,
+  team: (slug: string) => `/tedarikci/${encodeURIComponent(slug)}/admin/ekip`,
+} as const;

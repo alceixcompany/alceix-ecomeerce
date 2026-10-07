@@ -1,0 +1,5 @@
+"use client";
+import {ProfileEditor,type ProfileSettings} from "@/modules/admin-editors";
+import {supplierRoutes} from "@/config/supplier-routes";
+import {useSupplierWorkspace} from "../components/workspace-provider";
+export function SupplierSettings(){const {company,workspace,update,ready}=useSupplierWorkspace();if(!ready)return <p role="status">Firma profili hazırlanıyor…</p>;const initial:ProfileSettings={name:workspace.companyName,company:workspace.companyName,slug:company.slug,bio:workspace.description.slice(0,300),instagram:"",tiktok:"",whatsapp:"",youtube:"",seoTitle:workspace.companyName.slice(0,70),seoDescription:workspace.description.slice(0,160),isOpen:true,mode:"normal"};return <ProfileEditor supplier store={{name:company.name,slug:company.slug,initials:company.initials,storefrontSlug:company.slug}} initial={initial} storageKey={`alceix:supplier:${company.id}:profile:v1`} catalogUrl={supplierRoutes.products(company.slug)} onPersist={profile=>update(w=>({...w,companyName:profile.name,description:profile.bio}))}/>;}

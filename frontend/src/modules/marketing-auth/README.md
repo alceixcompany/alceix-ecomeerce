@@ -1,5 +1,7 @@
-# Account pages
+# Hesap sayfaları
 
-Routes: `/giris-yap` and `/kayit-ol`. Both use the shared `AuthScreen` and `AuthForm`; changing tabs navigates between the routes. The shared navigation's only account CTA links to `/kayit-ol`.
+`/giris-yap` ve `/kayit-ol` mevcut ortak tasarımı kullanır. `/sifremi-unuttum` aynı tema içinde e-posta doğrulama, istek önizlemesi, adres değiştirme ve girişe dönme akışını sunar. Şifre yenileme bağlantısı gönderilmez ve şifre değiştirilmez; auth backend bağlantısı beklenmektedir. E-posta / şifre / referans kodu loglanmaz ve kalıcı tarayıcı kaydına yazılmaz.
 
-Forms validate email and required fields locally. Registration requires eight password characters and matching confirmation. Password visibility is user-controlled. No API call, session, account creation, persistence or credential logging is implemented. Submit and password recovery display explicit unavailable messages with a support contact. Connect agreed authentication endpoints before enabling success behavior.
+Kayıt ekranında isteğe bağlı 3–32 karakterlik referans kodu bulunur (harf/rakam/tire). Kodun biçimi doğrulanır; gerçek kod geçerliliği, referans sahibinin eşleştirilmesi veya ödül sistemi henüz bağlı değildir. Kayıt şifresi en az sekiz karakter olmalı ve tekrar alanıyla eşleşmelidir. Gerçek oturum veya hesap oluşturulmaz.
+
+Kontrol: `node --test src/modules/marketing-auth/utils/auth-validation.test.mjs`, `npm run lint`, `npm run build`.

@@ -1,0 +1,20 @@
+"use client";
+import Link from 'next/link';
+import {useSearchParams} from 'next/navigation';
+import {useState} from 'react';
+import {AdminShell} from '../components/admin-shell';
+import type {AdminStore} from '../mocks/dashboard';
+import {suppliers} from '../mocks/suppliers';
+import {creators} from '../mocks/influencer';
+import {isMessages,containsExternalContact} from '../utils/collaboration';
+import type {ChatMessage} from '../types/collaboration';
+import {useWorkspaceRecord} from '../hooks/use-workspace-record';
+import {storeRoutes} from '@/config/store-routes';
+const contacts=[...suppliers.map(s=>({id:`supplier:${s.id}`,name:s.name,kind:'Tedarikçi',location:s.city})),...creators.map(c=>({id:`creator:${c.id}`,name:c.name,kind:'Influencer',location:c.location}))];
+const empty:ChatMessage[]=[];
+export function MessagesScreen({store}:{store:AdminStore}){
+ const params=useSearchParams(),requested=params.get('thread'),contact=contacts.find(c=>c.id===requested)||contacts[0];const messages=useWorkspaceRecord(`alceix:messages:${store.slug}`,empty,isMessages);
+ const [drafts,setDrafts]=useState<Record<string,string>>({}),[notice,setNotice]=useState('');const draft=drafts[contact.id]||'';const setDraft=(text:string)=>setDrafts(previous=>({...previous,[contact.id]:text}));const visible=messages.value.filter(m=>m.thread===contact.id);
+ function send(){if(!draft.trim())return;if(containsExternalContact(draft)){messages.setError('Ticaret ve iletişim Alceix içinde kalır. Telefon, e-posta, dış bağlantı veya harici mesajlaşma yönlendirmesi paylaşmayın.');return;}if(messages.save([...messages.value,{id:crypto.randomUUID(),thread:contact.id,text:draft.trim(),createdAt:new Date().toISOString()}].slice(-500))){setDraft('');setNotice('Mesaj yerel demo sohbetine eklendi; karşı tarafa teslim edilmedi.');}}
+ return <AdminShell store={store} active="messages" onNotice={setNotice}><header className="co-heading"><div><span className="co-eyebrow">ALCEIX İÇİ İLETİŞİM</span><h1>Mesajlar & İş Birlikleri</h1><p>Tedarikçileriniz ve içerik üreticileriyle tüm görüşmeler aynı yerde.</p></div><span className="co-badge">Yerel sohbet demosu</span></header>{requested&&!contacts.some(c=>c.id===requested)&&<p className="co-error" role="alert">Sohbet bulunamadı. İlk kişi gösteriliyor.</p>}<section className="co-card co-chat"><nav className="co-contacts" aria-label="Sohbet kişileriniz">{contacts.map(c=><Link key={c.id} href={storeRoutes.messages(store.slug,c.id)} className="co-contact" aria-current={contact.id===c.id?'page':undefined} onClick={()=>{messages.setError('');setNotice('');}}><strong>{c.name}</strong><small>{c.kind} · {c.location}</small></Link>)}</nav><div className="co-conversation"><div className="co-row"><div><strong>{contact.name}</strong><small>{contact.kind} · {contact.location}</small></div><Link className="co-secondary" href={contact.kind==='Tedarikçi'?storeRoutes.supplier(store.slug,contact.id.split(':')[1]):storeRoutes.creator(store.slug,contact.id.split(':')[1])}>Profili İncele</Link></div><div className="co-demo">Ürün, fiyat ve içerik görüşmelerinizi Alceix içinde sürdürün. Harici iletişim bilgileri paylaşılmaz. Demo mesajlar yalnızca bu tarayıcıda saklanır.</div><div className="co-messages" role="log" aria-label="Sohbet mesajları" aria-live="polite">{!visible.length?<p className="co-empty">Henüz mesaj yok. İlk görüşmenizi başlatın.</p>:visible.map(m=><div className="co-bubble" key={m.id}>{m.text}<small>{new Date(m.createdAt).toLocaleString('tr-TR')} · Yerel demo kaydı</small></div>)}</div><form className="co-form" key={contact.id} onSubmit={e=>{e.preventDefault();send();}}><label>Mesajınız<textarea maxLength={2000} required rows={3} value={draft} onChange={e=>setDraft(e.target.value)} placeholder="Ürün veya iş birliği hakkında yazın…"/></label>{messages.error&&<p className="co-error" role="alert">{messages.error}</p>}<button className="ad-button" disabled={!messages.ready||!draft.trim()}>Sohbete Ekle (Demo)</button></form>{notice&&<p className="co-success" role="status">{notice}</p>}</div></section></AdminShell>;
+}
