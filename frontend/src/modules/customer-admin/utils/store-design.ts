@@ -3,7 +3,7 @@ import type { StoreDesign, DesignSection } from "../types/store-design";
 export function youtubeVideoId(value:string):string|undefined {
   try {const url=new URL(value);if(url.protocol!=="https:")return;const id=url.hostname==="youtu.be"?url.pathname.slice(1):["youtube.com","www.youtube.com"].includes(url.hostname)&&url.pathname==="/watch"?url.searchParams.get("v"):null;return id&&/^[\w-]{11}$/.test(id)?id:undefined;}catch{return;}
 }
-export function isDesignImage(value:unknown):value is string {return typeof value==="string"&&value.length<2900000&&(/^\/(?:dropshipping|storefront)\/[a-zA-Z0-9/_-]+\.(?:png|jpg|webp)$/.test(value)||/^data:image\/(?:png|jpeg|webp);base64,[a-zA-Z0-9+/=]+$/.test(value));}
+export function isDesignImage(value:unknown):value is string {return typeof value==="string"&&value.length<2900000&&(value===""||/^\/api\/v1\/media\/[a-f0-9-]{36}$/.test(value)||/^\/(?:dropshipping|storefront)\/[a-zA-Z0-9/_-]+\.(?:png|jpg|webp)$/.test(value)||/^data:image\/(?:png|jpeg|webp);base64,[a-zA-Z0-9+/=]+$/.test(value));}
 export function isStoreDesign(value:unknown):value is StoreDesign {
   if(!value||typeof value!=="object")return false;const d=value as Record<string,unknown>;
   if(!d.announcement||typeof d.announcement!=="object"||!d.hero||typeof d.hero!=="object")return false;

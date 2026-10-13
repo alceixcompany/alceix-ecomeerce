@@ -10,7 +10,7 @@ test("account, settings, products, media, storefront and cart work through the s
   await page.goto("/kayit-ol");
   await page.getByLabel("Ad Soyad", { exact: true }).fill("Browser Owner");
   await page
-    .getByLabel("Mağaza Adı", { exact: true })
+    .getByLabel("Mağaza Adı (isteğe bağlı)", { exact: true })
     .fill("Tarayıcı Mağazası");
   await page.getByLabel("E-posta Adresi").fill(email);
   await page.getByLabel("Şifre", { exact: true }).fill("password123");

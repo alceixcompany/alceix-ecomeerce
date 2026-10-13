@@ -2,6 +2,7 @@ export type ShipmentStatus = "preparing" | "shipped" | "delivered" | "cancelled"
 export type PaymentStatus = "paid" | "pending" | "refunded";
 export type OrderLine = { name: string; sku: string; variant: string; image: string; quantity: number; unitCents: number };
 export type AdminOrder = {
+  version?: number; expiresAt?: string; reservation?: "held" | "released" | "consumed";
   id: string; createdAt: string; customer: string; email: string; phone: string;
   address: string; city: string; customerNote: string; internalNote: string;
   items: OrderLine[]; discountCents: number; shippingCents: number;

@@ -109,7 +109,7 @@ export function duplicateProduct(slug: string, id: string) {
 export function adjustStock(slug: string, id: string, amount: number) {
   return api(`${base(slug)}/products/${id}/stock`, productSchema, {
     method: "POST",
-    body: JSON.stringify({ amount }),
+    body: JSON.stringify({ amount, requestId: crypto.randomUUID() }),
   });
 }
 export function saveSettings(

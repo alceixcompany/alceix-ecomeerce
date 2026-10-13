@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { api, messageSchema } from "@/lib/http";
 export const authSchema = z.object({
+  platformAdmin:z.boolean().default(false),
   user: z.object({ id: z.uuid(), name: z.string(), email: z.email() }),
   stores: z.array(
     z.object({ id: z.uuid(), slug: z.string(), name: z.string() }),
@@ -27,3 +28,5 @@ export function logout() {
 export function currentAccount() {
   return api("/auth/me", authSchema);
 }
+
+export function resetPassword(token:string,password:string){return api('/auth/reset-password',messageSchema,{method:'POST',body:JSON.stringify({token,password})});}

@@ -9,6 +9,7 @@ export type StoreProduct = {
   badge?: string;
 };
 export type Store = {
+  design?: import("@/modules/customer-admin").PublishedDesign | null;
   id?: string; real?: boolean; canPurchase?: boolean; bannerImage?: string; logoImage?: string; faviconImage?: string; seoTitle?: string; seoDescription?: string; catalogTotal?: number; categories?: string[]; categoryCounts?: Record<string,number>;
   catalogPage?: number; catalogPageCount?: number; catalogQuery?: string; catalogAll?: number;
   slug: string;

@@ -20,6 +20,7 @@ import { errorMessage, ApiError } from "@/lib/http";
 import { routes } from "@/config/routes";
 import type { Store, StoreProduct } from "../data/stores";
 import "../storefront.css";
+import { youtubeVideoId, accentForeground } from "@/modules/customer-admin";
 
 const money = new Intl.NumberFormat("tr-TR", {
   style: "currency",
@@ -35,6 +36,9 @@ function Icon({ name }: { name: string }) {
 }
 
 export function Storefront({ store }: { store: Store }) {
+  const design=store.design;
+  const sectionOrder=(kind:string)=>design?.sections.findIndex(section=>section.kind===kind);
+  const productSection=design?.sections.find(section=>section.kind==="products");
   const catalogue = useCatalog(store);
   const query = catalogue.params.get("q") || "",
     setQuery = (value: string) => catalogue.change("q", value);
@@ -178,11 +182,10 @@ export function Storefront({ store }: { store: Store }) {
     );
   }
   return (
-    <div className="storefront">
-      <div className="sf-announcement">
-        <Icon name="auto_awesome" /> Az eşya, çok ilham. {store.name} seçkisini
-        keşfedin.<span>Alceix üzerinde bir mağaza</span>
-      </div>
+    <div className="storefront" style={design?{background:design.background==="beige"?"#faf6ef":"#fff",fontFamily:design.font==="serif"?"Georgia,serif":design.font==="inter"?"Arial,Helvetica,sans-serif":undefined}:undefined}>
+      {(!design||design.announcement.enabled)&&<div className="sf-announcement" style={design?{background:design.announcement.tone==="ink"?"#202b3c":design.announcement.tone==="cream"?"#f5eee2":"#eef4ff",color:design.announcement.tone==="ink"?"#fff":undefined}:undefined}>
+        <Icon name="auto_awesome" /> {design?design.announcement.text:<>Az eşya, çok ilham. {store.name} seçkisini keşfedin.</>}<span>Alceix üzerinde bir mağaza</span>
+      </div>}
       <header className="sf-header">
         <div className="sf-container sf-header-inner">
           <a href="#store-top" className="sf-brand">
@@ -231,22 +234,22 @@ export function Storefront({ store }: { store: Store }) {
           </button>
         </div>
       </header>
-      <main id="store-top">
-        <section className="sf-container sf-hero" aria-label="Mağaza banner’ı">
+      <main id="store-top" style={design?{display:"flex",flexDirection:"column"}:undefined}>
+        {(!design||design.sections.some(section=>section.kind==="hero"&&section.visible))&&<section style={design?{order:sectionOrder("hero")}:undefined} className="sf-container sf-hero" aria-label="Mağaza banner’ı">
           <div className="sf-hero-content">
             <span className="sf-eyebrow">
               {store.name.toLocaleUpperCase("tr-TR")} / GÜNLÜK YAŞAM
             </span>
-            <h1>
+            <h1>{design?design.hero.title:<>
               Biraz sade.
               <br />
               Biraz özel.
               <br />
-              <em>Tam size göre.</em>
+              <em>Tam size göre.</em></>}
             </h1>
-            <p>{store.tagline} Sevdiğiniz parçaları bir arada keşfedin.</p>
-            <a href="#products" className="sf-button">
-              Koleksiyonu keşfet <Icon name="arrow_forward" />
+            <p>{design?design.hero.description:<>{store.tagline} Sevdiğiniz parçaları bir arada keşfedin.</>}</p>
+            <a href="#products" className="sf-button" style={design?{background:design.accent,color:accentForeground(design.accent)}:undefined}>
+              {design?.hero.buttonLabel||"Koleksiyonu keşfet"} <Icon name="arrow_forward" />
             </a>
             <span className="sf-hero-note">
               İyi hissettiren detaylar, tek bir seçkide.
@@ -254,7 +257,7 @@ export function Storefront({ store }: { store: Store }) {
           </div>
           <div className="sf-hero-image">
             <Image
-              src={store.bannerImage || "/dropshipping/cardigan.jpg"}
+              src={design?.hero.image || store.bannerImage || "/dropshipping/cardigan.jpg"}
               alt={`${store.name} koleksiyonu`}
               fill
               priority
@@ -273,8 +276,8 @@ export function Storefront({ store }: { store: Store }) {
               01 / GARDIROBUN YENİ FAVORİSİ
             </span>
           </div>
-        </section>
-        <section
+        </section>}
+        <section style={design?{order:(sectionOrder("hero")??-1)+0.5}:undefined}
           className="sf-container sf-profile"
           aria-label="Mağaza bilgileri"
         >
@@ -323,13 +326,13 @@ export function Storefront({ store }: { store: Store }) {
             {followed ? "Takip ediliyor" : "Mağazayı takip et"}
           </button>
         </section>
-        <section className="sf-container sf-catalog" id="products">
+        <section style={design?{order:sectionOrder("products")}:undefined} className="sf-container sf-catalog" id="products">
           <div className="sf-catalog-heading">
             <div>
               <span className="sf-eyebrow">SEÇKİYİ KEŞFEDİN</span>
-              <h2>Seveceğiniz bir şey var.</h2>
+              <h2>{productSection?.title||"Seveceğiniz bir şey var."}</h2>
             </div>
-            <p>Size iyi gelen parçayı bulun.</p>
+            <p>{productSection?.description||"Size iyi gelen parçayı bulun."}</p>
           </div>
           <div className="sf-toolbar">
             <label className="sf-search">
@@ -583,6 +586,7 @@ export function Storefront({ store }: { store: Store }) {
           </div>
         </section>
         <StoreAbout
+          style={design?{order:design.sections.length}:undefined}
           store={store}
           onMissingSocial={(platform) =>
             setMessage(
@@ -590,7 +594,8 @@ export function Storefront({ store }: { store: Store }) {
             )
           }
         />
-        <section className="sf-container sf-bottom-note">
+        {design?.sections.filter(section=>section.visible&&!['hero','products'].includes(section.kind)).map(section=><section key={section.id} className="sf-container sf-catalog" style={{order:sectionOrder(section.kind)}} aria-label={section.title}><div className="sf-catalog-heading"><div><h2>{section.title}</h2><p>{section.description}</p></div></div>{section.kind==='collections'||section.kind==='instagram'?<><div className="sf-product-grid">{catalogue.items.slice(0,section.kind==='collections'?3:4).map(product=><button key={product.id} className="sf-product" onClick={()=>setModal(product)}><Image src={product.image} width={240} height={240} alt={product.name}/><strong>{product.name}</strong></button>)}</div>{section.kind==='instagram'&&store.socials.find(social=>social.platform==='Instagram')&&<a href={store.socials.find(social=>social.platform==='Instagram')!.url} target="_blank" rel="noreferrer">Instagram’da Gör</a>}</>:section.kind==='testimonials'?<p>Henüz değerlendirme yok.</p>:section.kind==='video'&&youtubeVideoId(section.videoUrl)?<iframe title={section.title} src={`https://www.youtube-nocookie.com/embed/${youtubeVideoId(section.videoUrl)}`} width="100%" height="360" allow="fullscreen; picture-in-picture" referrerPolicy="strict-origin-when-cross-origin"/>:section.kind==='bento'?<a className="sf-button" href="#products" style={{background:design.accent,color:accentForeground(design.accent)}}>Ürünleri Keşfet</a>:section.kind==='faq'?<p>Ürün, teslimat ve iade koşulları için mağazanın iletişim kanallarına başvurabilirsiniz.</p>:null}</section>)}
+        <section style={design?{order:design.sections.length+1}:undefined} className="sf-container sf-bottom-note">
           <Icon name="storefront" />
           <div>
             <h2>Küçük bir mağaza. Kendine özgü bir dünya.</h2>

@@ -9,11 +9,12 @@ import {
   toStoreProduct,
 } from "./services/storefront-api";
 import type { Store } from "./data/stores";
+import { publishedDesignSchema } from "@/modules/customer-admin";
 export const getStore = cache(
   async (slug: string, search = ""): Promise<Store | undefined> => {
     try {
       const { query, invalidRange } = catalogQuery(new URLSearchParams(search));
-      const [profile, list] = await Promise.all([
+      const [profile, list, published] = await Promise.all([
         serverApi(
           `/public/stores/${encodeURIComponent(slug)}`,
           publicStoreSchema,
@@ -22,6 +23,7 @@ export const getStore = cache(
           `/public/stores/${encodeURIComponent(slug)}/products?${query}`,
           publicListSchema,
         ),
+        serverApi(`/public/stores/${encodeURIComponent(slug)}/design`, publishedDesignSchema),
       ]);
       const social = [
         {
@@ -52,6 +54,7 @@ export const getStore = cache(
         },
       ];
       return {
+        design: published.design,
         id: profile.id,
         slug: profile.slug,
         name: profile.name,

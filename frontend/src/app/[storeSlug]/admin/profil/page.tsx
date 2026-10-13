@@ -1,6 +1,6 @@
 import {Suspense} from 'react';
 import {notFound} from 'next/navigation';
-import {getAdminStore} from '@/modules/customer-admin/mocks/dashboard';
+import {getAdminStore} from '@/modules/customer-admin/server';
 import {AccountScreen} from '@/modules/customer-admin/screens/account-screen';
 export const metadata={title:'Kullanıcı Profilim | Alceix',robots:{index:false,follow:false}};
-export default async function Page({params}:{params:Promise<{storeSlug:string}>}){const {storeSlug}=await params;const store=getAdminStore(storeSlug);if(!store)notFound();return <Suspense fallback={<p>Yükleniyor…</p>}><AccountScreen key={storeSlug} store={store} section="profile"/></Suspense>;}
+export default async function Page({params}:{params:Promise<{storeSlug:string}>}){const {storeSlug}=await params;const store=await getAdminStore(storeSlug);if(!store)notFound();return <Suspense fallback={<p>Yükleniyor…</p>}><AccountScreen key={storeSlug} store={store} section="profile"/></Suspense>;}
