@@ -10,7 +10,7 @@ Mağaza siparişleri kendi panelinde oturumluk tutulduğundan bu ekranda o modü
 
 Görüşme içeriği salt okunur. Ana panel, yönetici notunu ilgili taraflara göndermez. CSV dışa aktarımı filtrelenen kayıtları içerir ve formül başlangıçlarını etkisizleştirir.
 
-Bu bir frontend demo yönetim alanıdır. Gerçek ana yönetici oturumu, rol kontrolü, sunucuda kaynak yetkilendirmesi ve değiştirilemez denetim günlüğü bağlı değildir; `noindex` güvenlik mekanizması değildir. Gerçek üye bilgileri ve konuşmalar bağlanmadan önce okuma/yazma servislerinde ana yönetici yetkisi uygulanmalıdır. Bu istekte yeni backend veya kimlik doğrulama servisi kurulmadı.
+Platform layout gerçek oturum ve DB `platformAdmin` yetkisini doğrular. Rol sunucu CLI ile atanır; demo önizleme rolü yetki vermez. `/admin/destek` gerçek API kullanır; diğer yukarıdaki ekranlar demo snapshot/localStorage kullanmayı sürdürür. Gerçek audit, platform çalışan RBAC ve üye engelleme/onay işlemleri henüz yoktur. `noindex` güvenlik mekanizması değildir.
 
 ## Ekip, iletişim, destek ve finans
 
@@ -20,7 +20,7 @@ Ekipte rol şablonları, özel sayfa listeleri ve görüntüleme/düzenleme ayr�
 
 SMTP ayarları yalnızca gizli olmayan yapılandırmadır; parola/API anahtarı için tarayıcı alanı veya depolama yoktur. SMS/e-posta taslakları, izinli alıcı onayı, önizleme, demo kuyruk ve iptal akışları vardır. DNS, SMTP, SMS, teslim, unsubscribe ve gerçek iletişim izni doğrulaması bağlı değildir. Örnek e-posta adresleri gerçek alıcı olarak sunulmaz.
 
-Destek mağaza ve tedarikçi modüllerinin doğrulanmış açık yönetim sözleşmeleri üzerinden kaynak talepleri okur. Influencer talepleri ve platforma yöneltilen müşteri şikayeti örnek kayıtlardır. Ana panel yanıt/durum/atama katmanı kendi yerel kaydındadır; kaynak paneli değiştirmez ve yanıt iletmez. Canlı destek operatör üstlenme, yerel yanıt, kapatma ve yeniden sıraya alma demosudur; gerçek zamanlı servis yoktur.
+`/admin/destek` `services/support-api.ts` üzerinden gerçek mağaza platform kanalı taleplerini filtreli ve sayfalı okur. Yanıt ve durum aynı MongoDB talebini günceller; merchant paneli görür. Version/idempotent messageId korunur. Özel ek download gerçek platform rolü ve dosyanın bu talebe bağlanmış olmasını gerektirir. Görev ataması/dahili not/öncelik düzenleme henüz uygulanmadığından ilgili kontroller disabled'dır. Tedarikçi/creator/alıcı talepleri bu gerçek kuyrukta henüz yoktur. Canlı destek masası demo olarak kalır.
 
 Finans kuruş cinsinden hesaplanır. İptal dışı perakende ve B2B hacmi ayrı raporlanır. Alceix kazancı teslim edilmiş, ödenmiş perakende kayıtlarda %3 varsayımıdır; B2B veya influencer komisyonu uydurulmaz. Bekleyen sipariş komisyonu ayrı gösterilir. Aktarımlar bağımsız örnek muhasebe kayıtlarıdır, sipariş dönemine karşı bakiye mutabakatı sayılmaz. Pending → approved → recorded sırası ve kayıt referansı zorunludur; herhangi bir banka işlemi yapılmaz. Ekip, kampanya, destek ve finans değişiklikleri yerel operasyon geçmişine eklenir.
 
@@ -33,3 +33,5 @@ Ticari kayıtlar `alceix:platform-admin:commercial:v1` içinde doğrulanır. Kay
 Değerlendirme modülünün açık `management.ts` sözleşmesi her panelin kendi değerlendirme kapsamını okur; yalnızca hesabın aldığı yorumlar dahil edilir. Moderasyon ana panelin yerel katmanıdır, kaynak yorumları silmez/değiştirmez. Yönetim notu ve görünür/inceleme/demo gizli durumları kaydedilir.
 
 Kodlar mağaza/tedarikçi/influencer hesabına aittir. Referans ve kampanya kodu, komisyon geliri üzerinden kazanç payı, kampanya indirimi, tarih aralığı ve aktiflik ayarlanabilir. Kodlu kayıt bağlantısı mevcut kayıt formuna referansı önceden doldurur; gerçek kayıt atfı ve ödeme/indirim servisi yoktur. Demo yönlendirme kayıtları bilinen hesaplardan eklenir, öz yönlendirme ve bir müşteriyi birden fazla aktif referansa bağlamak reddedilir. Kod oranı değişse de mevcut yönlendirmenin kazanç payı korunur. Kazanç kayıt → onay → demo ödeme akışıyla ilerler; gerçek ödeme yapılmaz. Örnek komisyon baz tutarları kendi dönemine ait bağımsız veridir; tüm satışların otomatik referans geliri olduğu iddia edilmez.
+
+Güncel endpointler, rol ve tüm eksikler: [8 Ekim raporu](../../../../backend/docs/implementation-review-2026-10-08.md).

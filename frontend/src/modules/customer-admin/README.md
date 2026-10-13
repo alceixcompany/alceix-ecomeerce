@@ -1,6 +1,6 @@
 # Mağaza yönetimi
 
-`/{storeSlug}/admin` ve `/admin/dashboard` aynı genel bakışı; `/admin/ayarlar` profil/taslağı; `/admin/urunler` kataloğu gösterir. Sunucu `server.ts` üzerinden gerçek oturum ve mağaza sahipliğini doğrular. Girişsiz kullanıcı giriş sayfasına gider; başka mağaza/bilinmeyen mağaza 404 olur.
+`/{storeSlug}/admin` ve `/admin/dashboard` aynı genel bakışı; `/admin/ayarlar` profil/taslağı; `/admin/urunler` kataloğu gösterir. Sunucu `server.ts` üzerinden gerçek oturum ve mağaza sahipliği/aktif ekip üyeliğini ve endpoint capability sınırlarını doğrular. Girişsiz kullanıcı giriş sayfasına gider; başka mağaza/bilinmeyen mağaza 404 olur.
 
 `services/admin-api.ts` runtime doğrulanan API adaptörüdür. Katalog, ayarlar, taslak, kategori ve dosya kayıtları backend'de saklanır; localStorage/base64 kalıcılığı yoktur. Ürünler ve public vitrin tek kaynaktır. Listeleme server-side filtre/sıralama/altılı sayfalama; fiyat/stok/model ek filtreleri, 300 ms debounce, iptal edilen istekler ve sınırlı sayfa düğmeleri; CSV tüm filtrelenmiş sayfaları alır ve hücre formül enjeksiyonunu önler.
 
@@ -8,11 +8,11 @@
 
 Profil/taslak kaydı sunucudadır; taslak vitrini değiştirmez. Slug değişince panel yeni adrese geçer; eski adres alias değildir. Profil PNG/JPG/WebP en fazla 4 MB, ürün en fazla altı × 15 MB; gerçek yükleme kalıcı media URL döner. Dosya kaldırma ilişkiden ayırır; arka planda kullanılmayan dosya temizliği henüz yoktur.
 
-Dashboard katalog/kurulum özetinden türetilir. Satış, müşteri, sipariş ve bakiye servisleri henüz yok; sayısal demo başarıları gösterilmez. Operasyon menüleri mevcut dialoglarla servis durumunu açıklar. Özel domain/AI/finans/kargo iş akışları uygulanmış sayılmaz. Ayrıntılar: [backend raporu](../../../../backend/docs/implementation-review.md).
+Dashboard katalog/kurulum özetinden türetilir. CRM müşteri sayısı gerçek DB kayıtlarından gelir. Sipariş total/pending/cancelled sayıları gerçek kayıtlardan gelir. Satış ve bakiye servisleri henüz yok; sayısal demo başarıları gösterilmez. Operasyon menüleri mevcut dialoglarla servis durumunu açıklar. Özel domain/AI/finans/kargo iş akışları uygulanmış sayılmaz. Ayrıntılar: [backend raporu](../../../../backend/docs/implementation-review.md).
 
 ## Ek yönetim ekranları
 
-Katalog ve mağaza ayarları yukarıdaki sunucu adaptörlerini korur. Diğer yeni panel ekranları aşağıda belirtildiği gibi yerel demo verileri kullanır. Tedarikçi ortak editörleri müşteri mağazasının sunucu editörünü değiştirmez.
+Katalog ve mağaza ayarları yukarıdaki sunucu adaptörlerini korur. Profil, CRM, ekip ve destek ekranları gerçek API kullanır; aşağıda belirtilen diğer ticari ekranlarda demo veriler kalır. Tedarikçi ortak editörleri müşteri mağazasının sunucu editörünü değiştirmez.
 
 ## Cüzdan ve finans
 
@@ -22,33 +22,27 @@ Demo aktarım talebi kullanılabilir bakiyeyi aşamaz; bekleyen talepler bakiyed
 
 ## Sipariş ve kargo
 
-`/{storeSlug}/admin/siparisler` arama, durum/taşıyıcı/tarih filtreleri, sayfalama, toplu seçim ve CSV içerir. Filtreler doğrulanmış URL parametreleridir. `/{storeSlug}/admin/siparisler/{orderId}` ürün, teslimat, ödeme özeti, müşteri ve dahili not ekranıdır; bilinmeyen mağaza/sipariş 404 döner.
+`/{storeSlug}/admin/siparisler` gerçek API'den arama, durum/taşıyıcı/tarih filtreleri ve beşli pagination kullanır. UUID detay yolu, müşteri, snapshot ürün/fiyat, adres ve dahili not sunucudan gelir. API hatasında demo fallback yoktur. Bulunamayan/izinsiz sipariş API 404'ü hata olarak gösterir; geçersiz UUID rota 404 döner.
 
-İki ekranın demo kayıtları, sipariş rotalarına ve mağazaya bağlı provider içinde bellekte paylaşılır. Detay ve liste arasında gezinirken değişiklik korunur; yenileme veya sipariş alanından ayrılma veriyi sıfırlar. Manuel siparişler de bu kapsamdadır. Kişisel veriler tarayıcı depolamasına yazılmaz.
+Manuel form gerçek ilk 100 yayınlanmış ürünü/varyantını seçer; isim/e-posta/telefon/adres ve miktar gönderir. UUID attempt aynı girdiyle timeout retry'da korunur. Backend 30 dakikalık stok rezervasyonu ve pending ödeme oluşturur; fiyat sunucunun snapshot'ıdır. Not/adres CAS ile kaydedilir; iptal stok rezervasyonunu yalnız bir kez geri bırakır. Yenileme veriyi sıfırlamaz.
 
-Ödeme, gönderi ve iade/değişim durumları ayrı modellenir. Barkod yalnızca ödenmiş/hazırlanan kayıtta üretilir; barkodu olmayan veya ödenmemiş sipariş kargoya geçirilemez. Durum geçişi hazırlanan → kargoda → teslim edildi şeklindedir. İptal ve adres düzenleme yalnızca hazırlanan siparişte kullanılabilir. İptal gerçek ödeme iadesi yapmaz. Talep onayı otomatik para iadesi veya yeni gönderi oluşturmaz.
-
-Etiket, fatura ve paketleme görünümü tarayıcı yazdırma/PDF akışını açar. Barkod çizgileri görsel demodur ve gönderimde geçersizdir. Fatura önizlemesi mali belge değildir; KDV varsayımı yapılmaz. Kargo sözleşmesi, yazıcı ve bildirim tercihleri yalnızca demo ayarlardır; API anahtarı toplanmaz, taşıyıcıya veya müşteriye mesaj gönderilmez. `node --test src/modules/customer-admin/utils/order.test.mjs` kritik tutar, durum geçişi ve CSV kaçırma kontrollerini çalıştırır.
+Ödeme/kargo/iade sağlayıcıları hazır değil; paid/shipped/refunded işaretleme, barkod veya gerçek fatura üretimi yoktur. Taşıyıcı alanı tercihtir, kargo tutarı hesaplanmaz. Sipariş/paketleme özeti yazdırılabilir; mali belge değildir. CSV yalnız yüklenen sayfayı içerir. Viewer/support read, owner/editor write sınırları backend'dedir; menülerin rol bazında ayrılması henüz tamamlanmadı.
 
 ## Vitrin tasarımı
 
-`/{storeSlug}/admin/vitrin` duyuru, manşet/görsel, bölüm ekleme/sıralama/gizleme/düzenleme, zemin, renk ve tipografi içerir. Bölüm sürükleme yanında erişilebilir yukarı/aşağı butonları bulunur. Masaüstü/tablet/mobil seçimleri önizleme genişliğini değiştirir; tasarım verisi ortaktır. Tek türden bir bölüm, toplam en fazla 10 bölüm desteklenir. Bento, video ve S.S.S. dahil tüm eklenen bloklar aynı önizlemede render edilir.
+`/{storeSlug}/admin/vitrin` mevcut duyuru/hero/bölüm/font/renk kontrollerini korur. `design-api.ts` version'lı MongoDB draft/published kaydını kullanır; localStorage yoktur. Taslak public görünümü etkilemez; yayın onayı gerçek vitrine snapshot uygular. Yazma sırasında form dondurulur, hata girdiyi korur.
 
-`/{storeSlug}/admin/vitrin/onizleme?version=draft|published` tam ekran, etkileşimli demo vitrindir. Arama, kategoriler, ürün görselleri, ürün detayı ve demo sepeti vardır. Ödeme veya sipariş oluşturmaz. FAQ soruları örnek içeriktir; Instagram blokları yerel görsel vitrindir, canlı API akışı değildir. YouTube içeriği yalnızca kullanıcı oynat düğmesine bastığında, doğrulanmış video kimliği ile youtube-nocookie iframe içinde yüklenir.
+PNG/JPG/WebP en fazla 2 MB mevcut banner medya API'sine yüklenir; backend WebP sıkıştırma/boyutlandırma ve sahiplik kontrolü yapar. Dış/base64/başka mağaza veya product alanı görseli yayınlanamaz. Mevcut başlangıç şablonu ayrıca izinlidir.
 
-Taslak ve yayınlanan demo, `alceix:store-design:{storeSlug}:draft|published` anahtarlarıyla ayrı kaydedilir. JSON, görsel kaynağı, renk, font ve bölüm türleri okunurken doğrulanır. Yayınlama yalnızca bu tarayıcıdaki demo önizlemesini günceller; mevcut halka açık mağazaya veya sunucuya uygulanmaz. Gerçek tenant vitrin yayını için API sözleşmesi henüz yoktur. Özel domain ve SSL bağlantısı aktifmiş gibi sunulmaz.
-
-PNG/JPG/WebP en fazla 2 MB kabul edilir ve okunabilirliği decode ile kontrol edilir. Data URL bu tarayıcıda saklanabilir; kota hatasında kayıt durur. Sunucuya dosya yüklenmez. Sistem Sans ve Klasik Serif, cihazın Arial/Georgia karşılıklarını kullanır; yüklü olmayan Inter/Playfair fontları vaat edilmez. Vurgu renginde açık/koyu okunabilir metin rengi seçilir. Kaydedilmemiş sayfa/bölüm değişiklikleri için ayrılma ve kapatma uyarıları vardır.
-
-`node --test src/modules/customer-admin/utils/store-design.test.mjs`: kayıt doğrulama, güvenli görsel/video kaynağı, bölüm sıralaması, yayın koşulları, kapsam anahtarları ve renk kontrastı kontrolleri.
+`/{storeSlug}/admin/vitrin/onizleme?version=draft|published` sunucudaki görünüm ve gerçek ilk altı yayınlanmış ürünle çalışır. Önizleme sepeti gerçek sipariş oluşturmaz. Testimonials boş durumu gösterir; Instagram/collections gerçek ürün galerisi, FAQ açıklama/iletişim yönlendirmesidir. Sosyal ağdan veri çekilmez. Video güvenli YouTube ID kullanır. Yayında products görünür kalır. Ayrı FAQ/featured ürün seçimi ve tam tema kapsamı sonraki iştir.
 
 ### Müşteriler & CRM
 
-`/[storeSlug]/admin/musteriler` yalnızca kayıtlı demo mağazaları kabul eder. Müşteri listesi, profil/not düzenleme, müşteri ekleme, sadakat ve terk edilmiş sepet ayarları, iletişim/kampanya taslakları ve filtrelenmiş CSV dışa aktarımı içerir. Segment, arama, harcama, son sipariş ve sayfa filtreleri URL'de tutulur. VIP sınırı ₺5.000 toplam harcama; yeni kayıt sınırı 30 gün; hareketsizlik siparişi olan müşterilerde 90 gündür.
+`/[storeSlug]/admin/musteriler` gerçek mağaza erişimine ve CRM capability'lerine bağlıdır. `services/crm-api.ts` müşteri/ayar/iletişim taslağı sözleşmelerini Zod ile doğrular. Müşteri oluşturma, profil/not/izin düzenleme, arama/yeni kayıt filtresi, beşli server pagination ve CSV gerçek MongoDB kayıtlarını kullanır. Normalize e-posta mağaza içinde unique; güncellemeler version CAS. Büyük sayfa listesi en fazla beş sayfa düğmesi gösterir.
 
-Müşteriler ve ayarlar `alceix:crm:<storeSlug>`, kampanya taslağı `alceix:crm:<storeSlug>:campaign` altında tarayıcıda saklanır. Kayıtlar doğrulanır, mükerrer e-posta engellenir. SMS/e-posta/WhatsApp gönderilmez, otomasyon işletilmez, sadakat puanları finansal işlem değildir. Kampanya hedef kitlesi yalnızca iletişim izni işaretli kayıtları içerir. Özetler görünen demo verilerinden hesaplanır; çizelgeler dekoratif örneklerdir. Örnek siparişi bulunan profiller mevcut sipariş detayına bağlanır. Profil değişiklikleri sipariş verisini değiştirmez.
+Sipariş/harcama/VIP/hareketsiz/sepet/sadakat metrikleri henüz yoktur; finans alanları `—`, desteklenmeyen filtreler açık servis hatası gösterir. Sahte metrik payload'ı reddedilir. Sadakat ve terk edilmiş sepet kuralları kalıcı ayardır; otomasyon veya puan hareketi başlatmaz.
 
-Kontrol: `node --test src/modules/customer-admin/utils/customer.test.mjs` (segment sınırları, birleştirilmiş filtreler, kayıt doğrulama ve CSV formül kaçışı).
+Kampanya ve e-posta taslakları sunucuda saklanır; create retry UUID requestId ile aynı kayda döner, değişik payload aynı anahtarla reddedilir. E-posta alıcı önizlemesi bütün mağazanın izinli kayıtlarından sayılır, ilk 10 alıcıyla sınırlıdır; listedeki mevcut sayfayla sınırlanmaz. Taslak kayıtları e-posta/SMS/WhatsApp göndermez, teslim kuyruğu değildir. Yerel eski demo CRM kayıtları gerçek DB'ye otomatik aktarılmaz.
 
 ### Tedarikçi pazarı, API ayarları ve ürün detayları
 
@@ -58,19 +52,19 @@ Kontrol: `node --test src/modules/customer-admin/utils/customer.test.mjs` (segme
 
 Sepet ve tercihler `alceix:suppliers:<storeSlug>` altında doğrulanarak saklanır. Mesaj taslakları `alceix:suppliers:<storeSlug>:message:<supplierId>` altında yereldir. Mesaj gönderimi, tedarikçiden satın alma, API ağ çağrısı, gerçek stok eşitleme veya gerçek mağazada yayın yapılmaz. API/XML alanı yalnızca HTTPS adresinin biçimini ve güncelleme tercihlerini kaydeder; kimlik bilgileri toplanmaz.
 
-Aktarım onayı ürünlerin tüm varyantlarını ve görsellerini mevcut `alceix:products:<storeSlug>` demo kataloğuna ekler. Ürün Yönetimi sayfasında görülebilir. Varsayılan durum taslaktır; kimlik/SKU çakışması olan ürünler çoğaltılmaz ve bozuk katalog üzerine yazılmaz. Stoksuz ürünler sepete eklenmez. Fiyat kuralı %0–300 alış fiyatına ekleme oranıdır; örnek net hesabı satış eksi alış eksi %3 platform payıdır. Vergi, kargo ve diğer giderler hesapta yoktur. Paketleme tercihi üreticiye iletilmez.
+Aktarım onayı ürünlerin tüm varyantlarını ve görsellerini mevcut `alceix:products:<storeSlug>` demo kataloğuna ekler. Gerçek Ürün Yönetimi API kataloğunu okuduğu için bu yerel aktarım orada veya public vitrinde görünmez. Varsayılan durum taslaktır; kimlik/SKU çakışması olan ürünler çoğaltılmaz ve bozuk katalog üzerine yazılmaz. Stoksuz ürünler sepete eklenmez. Fiyat kuralı %0–300 alış fiyatına ekleme oranıdır; örnek net hesabı satış eksi alış eksi %3 platform payıdır. Vergi, kargo ve diğer giderler hesapta yoktur. Paketleme tercihi üreticiye iletilmez.
 
 Kontrol: `node --test src/modules/customer-admin/utils/supplier.test.mjs` (kuruş hesabı, varyant aktarımı, mükerrer aktarım ve API ayar doğrulaması).
 
 ### Destek masası
 
-`/<storeSlug>/admin/destek` platform/müşteri kanallarını, arama/öncelik/durum filtrelerini ve seçili talebi URL'de tutar. Yeni talepler, yerel yanıtlar, çözüldü/yeniden açma, talep bağlantısı kopyalama, TXT konuşma dökümü, bilgi bankası ve demo asistan içerir. WhatsApp düğmesi bağlantı durumunu açıklar; gerçek mesaj göndermeyen talep formuna yönlendirir.
+`/<storeSlug>/admin/destek` gerçek MongoDB talepleri, yanıtları ve durumları kullanır. Kanal/arama/öncelik/durum/sayfa/talep URL'dedir; 20'li server pagination ve ayrı tek talep lookup'u ilk sayfa dışındaki deep link'i de açar. İstek iptali, boş liste, yükleme ve hata/retry durumları vardır. UUID messageId retry çift yanıt oluşturmaz; version çakışması ezmez. Talep başına 100 mesaj sınırı.
 
-`alceix:support:<storeSlug>` anahtarında doğrulanan talepler ve yanıt taslakları saklanır. Sekme/talep geçişinde taslaklar korunur; açık kayıt edilmemiş taslaklarla sayfadan ayrılırken koruma vardır. En fazla 100 talep, talep başına 100 mesaj, yanıt başına üç ek desteklenir. PNG/JPG/WebP/PDF/TXT dosyaları dosya başına 2 MB ile sınırlıdır. Ekler yerel data URL olarak saklanır ve indirilebilir; HTML/SVG ve çalıştırılabilir dosyalar kabul edilmez. Büyük eklerde tarayıcı kotası aşılırsa form korunur ve hata gösterilir. Dosya seçmek sunucuya yükleme değildir.
+Kaydedilen yanıt taslağı `(storeId,ticketId,userId)` kapsamında özeldir; MongoDB'ye yazılır, yeniden yüklemede korunur. Aynı içerikli taslak yanıtla birlikte transaction içinde temizlenir; farklı eşzamanlı taslak korunur. Gönderilmemiş düzenlemelerde ayrılma koruması vardır.
 
-Destek ekibi, müşteri, WhatsApp veya yapay zekâ servisine ağ çağrısı yapılmaz. Örnek konuşmalar gerçek destek yanıtları değildir; asistan yerel rehber metinlerini sunar. İstatistikler demo kayıtlarından hesaplanır; canlı SLA veya çevrimiçi operatör iddiası yoktur. Sipariş bağlantıları mevcut demo sipariş detayını açar.
+En fazla üç ek, dosya başına 2 MB. Resimler normalize WebP, TXT UTF-8 kontrolü, PDF başlık/EOF kontrolü. Ekler özel storage'a yüklenir; metadata sunucudan gelir. Public ürün medya URL'si veya base64/localStorage kalıcılığı yoktur. Merchant download mağaza support-read, platform download gerçek platform rolü + talebe bağlı dosya gerektirir. Bağlanmamış dosyaların cleanup job'ı henüz yok.
 
-Kontrol: `node --test src/modules/customer-admin/utils/support.test.mjs` (birleşik filtreler, kapalı talep yanıt kuralları, ek sınırları ve yerel kayıt doğrulaması).
+Platform desteği gerçek `/admin/destek` ekranına bağlıdır; görevli yanıtı merchant ekranında görünür. Merchant'in `customer` kanalı şu an manuel taleptir; gerçek alıcı hesabı/başvuru sayfası yoktur. Bilgi bankası yerel statik içerik; asistan ve WhatsApp teslimi henüz bağlı değildir.
 
 ### Influencer ve reklam yönetimi
 
@@ -92,22 +86,26 @@ Gerçek AI API'si yoktur: sonuçlar projedeki sabit örnek görsellerdir; model/
 
 - `/admin/mesajlar?thread=supplier:modatekstil` veya `creator:melis`: tedarikçi / influencer görüşmeleri. Yerel demo mesaj kaydı, telefon/e-posta/harici bağlantı paylaşımı için arayüz kontrolü. Sunucuda teslim, katılımcı yetkisi, moderasyon ve bağlantı denetimi uygulanmalıdır.
 - `/admin/kampanyalar`: açık kampanya oluşturma, örnek influencer başvuruları, kontenjana göre seçim / ret / geri alma, portföy ve sohbet bağlantıları. Gerçek influencer başvuru paneli veya canlı yayın yoktur. Mevcut doğrudan teklif akışı korunur.
-- `/admin/profil`: kişisel profil, üst sağ hesap menüsü, kaydedilmemiş profil uyarısı. Gerçek giriş e-postası veya oturum değiştirilmez.
-- `/admin/ekip`: e-posta daveti hazırlama, görev düzenleme, demo kabulü ve kaldırma onayı. Tek aktif sahip korunur. E-posta teslimi, davet tokenı, çoklu kullanıcı oturumu ve sunucu RBAC henüz yoktur.
+- `/admin/profil`: gerçek kişisel profil API, hesap menüsü ve version kontrolü. Alanlar yükleme/yazma sırasında disabled; geç gelen kayıt düzenlemeyi ezmez. Giriş e-postası readonly, rol payload ile atanamaz.
+- `/admin/ekip`: gerçek süreli/hash'li davet, görev değiştirme ve kaldırma. Davet edilen hesap `/ekip-daveti` üzerinden kabul eder; owner, editor, support, viewer sınırları sunucuda doğrulanır. Owner dahil 50 koltuk transaction'lıdır; davet e-posta teslimi henüz yoktur.
 - Tedarikçi detayında bağlı mağaza puan / yorum ekleyebilir ve kendi yorumunu güncelleyebilir. Bağlantı ürün aktarımı veya açık demo bağlama işlemi üzerinden belirlenir. Örnek yorumlar ve yerel değerlendirme ortak demo ortalamasını oluşturur; gerçek ortak yorum havuzu yoktur.
 - Tedarik ürününde / aktarım sepetinde özel satış fiyatı belirlenir. Pozitif tamsayı kuruş kaydı, komisyon/kâr özeti ve ürün kataloğuna aktarım aynı fiyatı kullanır. Önceden aktarılan ürünün fiyatı Ürün Yönetimi üzerinden düzenlenir.
-- CRM toplu e-posta: izinli alıcı segmenti, terk edilmiş sepet tutarıyla kişiselleştirme, alıcı önizlemesi ve yerel demo kuyruğu. Gerçek teslim, ürün bazında sepet bağlantısı ve abonelikten çıkma endpointleri backend/e-posta servisi gerektirir.
+- CRM toplu e-posta: MongoDB taslağı, izinli alıcı önizlemesi. Eksik sepet tutarı uydurulmaz; gerçek gönderim/abonelikten çıkma henüz yoktur.
 
-Kayıtlar `alceix:<özellik>:<storeSlug>` anahtarlarıyla ayrılır; sınırda çalışma zamanı doğrulaması yapılır. Bu yerel kayıtlar bağlantı veya erişim yetkisi kanıtı değildir. Gerçek sistemde fiyat, mağaza bağlantısı, yorum uygunluğu, kampanya seçimi ve ekip yetkileri sunucuda doğrulanmalıdır.
+Kalan demo iş birliği kayıtları `alceix:<özellik>:<storeSlug>` anahtarlarıyla ayrılır; sınırda çalışma zamanı doğrulaması yapılır. Bu yerel kayıtlar bağlantı veya erişim yetkisi kanıtı değildir. Gerçek sistemde fiyat, mağaza bağlantısı, yorum uygunluğu, kampanya seçimi sunucuda doğrulanmalıdır. Mağaza ekip yetkileri bu aşamada sunucuda uygulanmıştır.
 
 Kontrol: `node --test src/modules/customer-admin/utils/collaboration.test.mjs src/modules/customer-admin/utils/supplier.test.mjs`, `npm run lint`, `npm run build`.
 
 ## Sayfa geçişleri ve performans
 
-Dashboard navigasyonu tam belge yüklemek yerine App Router kullanır. Ortak menüdeki dinamik panel bağlantıları üretimde önceden yüklenir; admin `loading.tsx` geçiş beklerken erişilebilir yükleme durumu gösterir. Mevcut URL tabanlı yerel katalog / CRM / influencer / destek filtreleri Next.js 15.5.4 tarafından desteklenen History API ile güncellenir. Bu filtrelerin tüm verisi tarayıcıdaki demo veridir; sunucu araması eklenirse veri adaptörü / navigasyon sözleşmesi yeniden değerlendirilmelidir. URL ve yeniden yüklemeyle filtreler korunur, rota değişiklikleri App Router üzerinden devam eder.
+Dashboard navigasyonu tam belge yüklemek yerine App Router kullanır. Ortak menüdeki dinamik panel bağlantıları üretimde önceden yüklenir; admin `loading.tsx` geçiş beklerken erişilebilir yükleme durumu gösterir. Mevcut URL tabanlı yerel katalog / CRM / influencer / destek filtreleri Next.js 15.5.4 tarafından desteklenen History API ile güncellenir. Katalog, CRM ve destek filtreleri gerçek server sorgularına bağlıdır; influencer ve diğer demo kayıtları hâlâ yerel filtrelenir. URL ve yeniden yüklemeyle filtreler korunur, rota değişiklikleri App Router üzerinden devam eder.
 
-Hesap menüsü yalnızca profil kaydı değiştiğinde depolamayı okur; profil doğrulaması katalog mocklarını ortak pakete taşımaz. Font tanımları tek global CSS üzerinden gelir. Sayfa geçişindeki genel yumuşak belge kaydırması kaldırılır; açıkça istenen sayfa içi rapor kaydırması korunur.
+Hesap menüsü gerçek profil API'sini ve kaydetme sonrasında profil güncelleme olayını kullanır; profil doğrulaması katalog mocklarını ortak pakete taşımaz. Font tanımları tek global CSS üzerinden gelir. Sayfa geçişindeki genel yumuşak belge kaydırması kaldırılır; açıkça istenen sayfa içi rapor kaydırması korunur.
 
 `/admin/degerlendirmeler` ortak `reviews` modülünü kullanır: mağaza, tedarikçi ve influencer yorumlarını görüntüleme, 1–5 puanla örnek değerlendirme, kendi profile gelen yoruma yanıt ve inceleme kaydı. Filtreler URL'de, demo kayıtları mağaza kapsamlı tarayıcı deposunda tutulur. Gerçek ilişki doğrulaması, gönderim ve paneller arası ortak puan hesabı henüz bağlı değildir.
 
 Ürün editörü ve profil formunun ortak sahibi `admin-editors` modülüdür; müşteri dış arayüzü mevcut yolları korur. Tedarikçi paneli aynı bileşenleri B2B fiyat/minimum adet ve firma profili uyarlamalarıyla kullanır.
+
+Önceki kapsam, rol tablosu ve sayfa envanteri: [8 Ekim raporu](../../../../backend/docs/implementation-review-2026-10-08.md).
+
+9 Ekim: gerçek sipariş liste/detay/manüel oluşturma/adres/not/iptal, dashboard sipariş sayıları ve sunucuda CMS taslak/yayın bağlandı. Ödeme bekler; sağlayıcı bağlı değildir. Önizleme gerçek katalog kullanır; sipariş oluşturmaz. Kapsam ve eksikler: [güncel rapor](../../../../backend/docs/implementation-review-2026-10-09.md).

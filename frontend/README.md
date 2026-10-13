@@ -1,5 +1,7 @@
 # Frontend
 
+8 Ekim: kişisel profil, CRM/taslaklar, mağaza ekibi/RBAC, özel dosyalı destek, platform destek ve iletişim formu gerçek API'ye bağlı. Diğer ticari demo alanları ve 92 rotanın durumu [önceki envanterde](../backend/docs/implementation-review-2026-10-08.md). Frontend tedarikçi/influencer admin hâlâ geçici platform demo kapısını kullanır. Gerçek partner sahipliği/onboarding/ekip/ticaret backend'i 13 Ekim'de eklendi; panel adaptörleri ve rol kapısı henüz bağlanmadı.
+
 ## Tedarikçi yönetimi
 
 Panel: `/tedarikci/modatekstil/admin` (diğer firma slug'ları da desteklenir).
@@ -12,45 +14,29 @@ Panel: `/tedarikci/modatekstil/admin` (diğer firma slug'ları da desteklenir).
 - `/ekip`: davet taslağı, görev seçimi, rol düzenleme ve ekip kaydını duraklatma.
 - `/destek`: talep oluşturma, arama, durum filtresi, yanıt, kapatma ve yeniden açma.
 
-Veriler firma bazında tarayıcıda saklanır. Ek araçların kaydı `alceix:supplier:<firma-id>:tools:v1` anahtarında doğrulanarak yüklenir. Bunlar demo akışlarıdır: gerçek AI üretimi, ödeme/IBAN aktarımı, kargo entegrasyonu, e-posta daveti, sunucu mesajlaşması ve kullanıcı yetkilendirmesi bağlı değildir. AI stüdyo mevcut örnek görselleri kullanır; krediler örnek sayaçtır. Siparişler son tüketiciye satış açmaz.
+Veriler firma bazında tarayıcıda saklanır. Ek araçların kaydı `alceix:supplier:<firma-id>:tools:v1` anahtarında doğrulanarak yüklenir. Bunlar demo akışlarıdır: gerçek AI üretimi, ödeme/IBAN aktarımı, kargo entegrasyonu, e-posta daveti, sunucu mesajlaşması ve firmanın gerçek hesap/üyelik sahipliği bağlı değildir. AI stüdyo mevcut örnek görselleri kullanır; krediler örnek sayaçtır. Siparişler son tüketiciye satış açmaz.
 
 Doğrulama: `node --test src/modules/supplier-admin/utils/*.test.mjs`, `npm run lint`, `npm run build`.
 
 Geliştirmeye başlamadan önce [frontend geliştirme kurallarını](./AGENTS.md) okuyun. Modül yapısı, rota düzeni, veri erişimi ve devir teslim standartları bu dosyada tanımlıdır.
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Kurulum ve doğrulama
 
-## Getting Started
-
-First, run the development server:
+Önce MongoDB replica set ve backend'i [backend README](../backend/README.md) üzerinden hazırlayın. `frontend/` içinde `npm ci`, yeni ortamda `.env.example` → `.env.local`, ardından `npm run dev`. Var olan `.env.local` dosyasını ezmeyin. Normal backend adresi `http://127.0.0.1:4000`; tarayıcı istekleri aynı origin `/api/v1` proxy üzerinden gider.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run lint
+npm run build
+node --test $(rg --files src -g '*.test.mjs')
+npm run test:e2e
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Playwright geçici backend 4010 / production frontend 3010 ve izole MongoDB replica set açar; test sonunda kapatır. Aynı `.next` dizini kullanıldığı için mevcut `next start` test öncesi kapalı olmalıdır. Sonrasında normal API ayarıyla `npm run build` tekrar çalıştırın. Kişisel veri/medya ve test çıktıları Git dışında kalır.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Tüm geliştirme kuralları [AGENTS.md](AGENTS.md) içinde; kurulu paket sürümleri `package.json` ve lock dosyasıyla belirlenir.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+9 Ekim: gerçek sipariş liste/detay/manüel oluşturma/adres/not/iptal, dashboard sipariş sayıları ve sunucuda CMS taslak/yayın bağlandı. Ödeme bekler; sağlayıcı bağlı değildir. Önizleme gerçek katalog kullanır; sipariş oluşturmaz. Kapsam ve eksikler: [güncel rapor](../backend/docs/implementation-review-2026-10-09.md).
 
-## Learn More
+## 13 Ekim backend teslimi
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+[Backend raporu](../backend/docs/implementation-review-2026-10-13.md) her ekranın API eşlemesini ve eksik checkout/alıcı sipariş/dönüş/doğrulama/partner davet sayfalarını içerir. Yeni backend'ler [rota envanterinde](../backend/docs/api-route-inventory.md). Bu aşamada mevcut görseller/CSS değiştirilmedi; burada anlatılan demo araçlar gerçek ödeme/AI/gönderim başarıları sayılmaz. Provider HTTP bridge sözleşmesi vardır, gerçek vendor adaptörleri yoktur.

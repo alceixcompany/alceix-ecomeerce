@@ -54,7 +54,7 @@ docs/
 
 ## 4. Birbirine bağlı iş alanları
 
-- Kullanıcının mağaza, tedarikçi ve influencer adres modeli `docs/decisions/002-platform-routes-and-catalogue-performance.md` içinde kayıtlıdır. Mağaza yönetimi mevcut; tedarikçi/influencer panelleri ayrıca geliştirilecek. Ayrılmış namespace slug'larını mağaza adresi olarak kullanma.
+- Kullanıcının mağaza, tedarikçi ve influencer adres modeli `docs/decisions/002-platform-routes-and-catalogue-performance.md` içinde kayıtlıdır. Mağaza yönetimi ve partner backend sahipliği/ekibi/ticareti mevcuttur; partner frontend bağlantıları ayrıca geliştirilecektir. Ayrılmış namespace slug'larını mağaza adresi olarak kullanma.
 
 - Mağaza sahipliği, kullanıcı ile mağaza arasındaki açık ilişki üzerinden belirlenir. Kullanıcı hesabı, mağaza yönetim üyeliği ve alışveriş müşterisi kavramlarını sebepsiz yere tek kayıt/rol altında birleştirme.
 - Admin ve halka açık vitrin aynı mağaza ve katalog kayıtlarını kullanır. Ayrı demo katalogları veya iki bağımsız gerçek ürün kaynağı oluşturma.
@@ -62,6 +62,7 @@ docs/
 - Bir ürünü yayınlama, taslak kaydetme ve satıştan kaldırma davranışları açıkça tanımlanır. Vitrin yalnızca yayınlanmasına izin verilen kayıtları gösterir.
 - Başvurular hesap, mağaza veya aktif ortaklık değildir. Bir başvurunun gönderilmesi kendiliğinden yetki veya onaylanmış tedarikçi/influencer kaydı oluşturmaz.
 - Sipariş geliştirilirken ürün kimliğine ek olarak satın alma anındaki ad, SKU/varyant, fiyat, para birimi, indirim ve gerekli toplam bilgilerini snapshot olarak sakla. Sonradan ürün güncellenmesi geçmiş siparişi değiştirmez.
+- Sipariş/stok rezervasyonu ve CMS başlangıç sözleşmesi `docs/decisions/004-orders-and-store-design.md` içindedir. Order create requestId aktör + mağaza kapsamındadır; stok/order aynı transaction, iptal stok bırakmayı tekrarlamaz. CMS draft public görünümü değiştirmez; published snapshot ve medya alan/sahipliği doğrulanır. Sağlayıcı bağlı olmadan paid/shipped/refunded/fatura başarısı ekleme.
 - Sipariş, ödeme, gönderi ve iade durumları ayrı modellerdir. Geçişleri açıkça tanımla; bir `status` alanıyla bütün süreçleri temsil etme.
 - Dashboard mevcut iş kayıtlarından türetilir. Gösterilen bakiye, satış, stok veya müşteri sayılarını bağımsız elle güncellenen ikinci doğruluk kaynağı yapma.
 
@@ -107,6 +108,16 @@ docs/
 - Şifre sıfırlama token'ları süreli, tek kullanımlık ve güvenli saklanır. Hassas hesap varlığını açıklayan response'lar üretme; oturum iptali ve süresinin dolmasını ele al.
 - Secret, şifre, oturum token'ı ve gereksiz kişisel veriyi loglama. Kullanıcılar/mağazalar arasında cache anahtarları ve geçici durumlar karışmaz.
 
+### Uygulanan üyelik ve platform sınırları
+
+- `StoresService.owned` varsayılanı owner-only kalır. Ekip erişimine açık kullanım senaryosu `StoreCapability` ister; yeni endpoint'i sırf oturum var diye tüm üyelere açma. Yetki tablosu [003 kararında](docs/decisions/003-store-membership-and-operations.md) ve [güncel raporda](docs/implementation-review-2026-10-09.md).
+- Owner ilişkisi davetle değişmez. Davet hash'li, süreli, tek kullanımlık ve doğru e-posta hesabına bağlıdır. Üyelik insert/remove ile `StoreTeamQuota` değişimi aynı transaction'dadır; 49 açık üyelik + owner sınırını koru.
+- `User.platformAdmin` yalnız sunucu yönetim komutuyla atanır. UI demo rol seçimi, müşteri profil payload'ı veya partner başvurusu platform yetkisi değildir. Partner panellerinin geçici staff demo erişimini gerçek partner sahipliği olarak sunma.
+- CRM müşteri kaydı, auth hesabı ve sipariş alıcısını sebepsiz birleştirme. Sipariş metriği yokken harcama/puan/VIP/sepet sonucu üretme. Kampanya/e-posta kaydı yalnız taslaktır; gönderim için ayrı izin/opt-out ve teslim sözleşmesi gerekir.
+- Destek yanıt taslağı `(storeId,ticketId,userId)` kapsamlıdır. Yanıtla aynı taslak temizliği transaction'lıdır; farklı eşzamanlı taslağı silme ve version'ı sıfırlama. Platform görevlisi yalnız platform kanalı taleplerini ve onlara bağlanmış ekleri açabilir; ekip kullanıcısının özel taslağını okuyamaz.
+- Idempotent oluşturmayı düzenlenebilir kaydın son içeriğiyle karşılaştırma; ilk girdi değişmez saklanır ve public response'a eklenmez. Destek yanıt tekrarını yalnız author türüne değil doğrulanmış kullanıcı kimliğine de bağla; eski kaydın bilinmeyen sahibini tahmin etme. Kalıcı yazma sonrası okuma hatasını yazma başarısızlığı olarak sunma.
+- Destek dosyalarını public ürün medya rotasına veya base64 response/localStorage modeline taşıma. Dosya kontrolü, mağaza kapsamı ve özel indirme erişimi korunur.
+
 ## 8. Medya ve dış servisler
 
 - Ürün ve mağaza dosyalarını production'da uygun kalıcı dosya/object storage üzerinden yönet; DB'de dosya kimliği ve metadata sakla. Frontend'in base64/blob demo depolamasını gerçek backend modeli yapma.
@@ -144,3 +155,16 @@ docs/
 
 - [NestJS modülleri](https://docs.nestjs.com/modules), [providers ve DI](https://docs.nestjs.com/providers), [custom providers](https://docs.nestjs.com/fundamentals/custom-providers).
 - [MongoDB veri modelleme](https://www.mongodb.com/docs/manual/data-modeling/embedding/), [transaction'lar](https://www.mongodb.com/docs/manual/core/transactions/), [unique indeksler](https://www.mongodb.com/docs/manual/core/index-unique/).
+
+## 13 Ekim ticari backend kuralları
+
+- Güncel kapsam [13 Ekim raporu](docs/implementation-review-2026-10-13.md), provider kontratı [gateway v1](docs/integration-gateway-v1.md), sınırlar [005 kararında](docs/decisions/005-commerce-and-provider-boundaries.md). Önceki raporlardaki "yok" ifadeleri güncel kod yerine kaynak alınmaz.
+- Merchant/partner/account scope UUID'lerini ve capability'lerini ayrı doğrula. Partner erişimi varsayılan owner-only; team erişimi açık capability ister. Store editor/support/viewer ile partner operations/finance/support/viewer aynı yetki seti değildir. Banka/payout/ekip yetkilerini sırf read izni var diye genişletme.
+- Gateway ayarı vendor entegrasyonu değildir. HTTP kabulü terminal başarı değildir; sonuç amount/currency/reference/tracking/actor/scope ile ve imzayla kontrol edilir. Aynı iş UUID'si tekrar gönderilir; terminal provider failure transport retry sayılmaz. Callback/pull aynı domain handler ve receipt'i kullanır.
+- Network, SMTP, AI binary ve provider cancellation DB transaction dışında kalır. Side effect'e ihtiyacı olan business transaction kalıcı job/outbox oluşturur. Ambiguous dış işlemde rezervasyon/escrow'u teyitsiz bırakma; opt-out sonrası belirsiz gönderimi sahte skipped yapma.
+- Para hareketi balanced immutable journal ile, BigInt/int kuruş ve Decimal128 kesin toplamlarla yapılır. Capture, maturity, refund ve payout reserve/review/result ayrı kaynaklardır. iade geçmişi silinmez; negatif gerçek bakiye sıfıra kırpılmaz. Payee verified-bank aktör ve kapsamı doğrulanır; ham IBAN veya gateway token response/log olmaz.
+- Politika yokken production komisyon, iade süresi, AI fiyatı veya referral ödülü tahmin edilmez. Snapshot şartları gelecekteki policy güncellemesiyle geriye dönük değişmez. B2B alımda client maxTotalCents para çıkışına üst sınırdır; katalog import fiziksel stok yaratmaz.
+- Partner destek kayıtlarında legacy storeId kolonu scope UUID'sidir; scopeKind store/partner sunumunu ayırır. Controller gerçek parent sahipliğini doğrular. Başka modül bu koleksiyonu doğrudan okumaz. Platform dosya erişimi bağlı platform ticket koşulunu korur.
+- Retained public/private dosyalar otomatik silinmez. Cleanup yalnız yeni unclaimed yaşlı dosyalarda CAS deleting durumuyla çalışır; retain yarışını kaybeden kullanıma izin verilmez. Storage remove yalnız ENOENT'i başarılı sayar, I/O hatası metadata'yı silmez. AI kalıcı çıktısı katalogda yayınlanmadan da retained olur.
+- İndeks/seed/rol komutları background worker başlatmaz. Yeni worker WORKERS_ENABLED ve kontrollü kapanışı uygular; DB worker'lardan sonra kapanır. Test yalnız kendisine ait MongoDB/medya/port üzerinde çalışır.
+- Daily satışlar UTC application-payment-confirmation tarihinden türetilir. Legacy bilinmeyen tarih için createdAt kullanarak satış grafiği uydurma. Net satış toplamını kullanılabilir wallet, platform komisyonu veya kâr diye etiketleme.

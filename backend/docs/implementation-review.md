@@ -1,5 +1,10 @@
 # Frontend bağlantıları ve kalan ihtiyaçlar
 
+> Güncel kapsam/eksikler: [13 Ekim 2026 raporu](implementation-review-2026-10-13.md). Bu belgedeki önceki eksikler tarihsel durumu anlatır.
+Sonraki geliştirme ve güncel eksikler: [9 Ekim raporu](implementation-review-2026-10-09.md). Bu belge önceki aşamanın tarihsel kaydıdır.
+
+> Bu belge 1 Ekim tarihli ilk aşamadır. [8 Ekim güncel inceleme ve uygulama raporu](implementation-review-2026-10-08.md) yeni ekranları, ekip/RBAC, CRM, destek ve kalan işleri içerir.
+
 Tarih: 2026-10-01. Mevcut sayfaların kalıcı backend bağlantılarının ilk bölümü tamamlandı. Mevcut yerleşim ve görsel varlıklar korundu. İlk backend entegrasyonunda CSS değiştirilmedi; sonraki performans isteği kapsamında yükleme skeleton/shimmer efektleri ile sayfalama/filtre kontrollerinin CSS'i eklendi. Form gönderimleri, veri kaynağı, oturum, hata/başarı durumu ve gerçeği yansıtmayan demo metinleri güncellendi.
 
 ## Uygulanan bağlantılar

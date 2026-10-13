@@ -1,5 +1,7 @@
 # Kalıcı MongoDB ve canlı tarayıcı denemesi
 
+> Bu kayıt 1 Ekim canlı denemesidir. Daha sonraki backend/frontend değişiklikleri ve güncel doğrulama için [8 Ekim raporuna](implementation-review-2026-10-08.md) bakın.
+
 Tarih: 2026-10-01. Kullanıcının istediği görünür deneme Codex tarayıcısında, `localhost:3000` frontend ve `127.0.0.1:4000` backend ile yapıldı. Veriler sahte başarı adaptörü yerine yerel MongoDB replica set'inde `alceix_demo` veritabanına kaydedildi. Mevcut kullanıcı verisi silinmedi.
 
 ## Demo erişimi

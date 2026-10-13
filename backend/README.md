@@ -1,14 +1,22 @@
 # Alceix backend
 
-NestJS + TypeScript modüler monolit, MongoDB/Mongoose persistence. İş alanları: auth, users, stores, catalog, media, applications, engagement, dashboard. Controller/DTO, kullanım senaryosu/port, domain ve adaptörler ayrı tutulur. Kurallar: [AGENTS.md](AGENTS.md). Kararlar: [001-backend-foundation.md](docs/decisions/001-backend-foundation.md). Kapsam ve eksikler: [implementation-review.md](docs/implementation-review.md).
+NestJS + TypeScript modüler monolit, MongoDB/Mongoose persistence. İş alanları auth/users/stores/catalog/media ve ticari modüllere ayrıdır; tam kapsam aşağıda ve güncel rapordadır. Ekip üyeliği stores modülündedir. Controller/DTO, kullanım senaryosu/port, domain ve adaptörler ayrı tutulur. Kurallar: [AGENTS.md](AGENTS.md). Kararlar: [001-backend-foundation.md](docs/decisions/001-backend-foundation.md). Kapsam ve eksikler: [13 Ekim geliştirme raporu](docs/implementation-review-2026-10-13.md).
 
-## Mevcut kapsam ve doğrulama
+## Güncel kapsam — 13 Ekim 2026
 
-2026-10-01 itibarıyla kayıt/giriş/çıkış, mağaza sahipliği, profil ve ayar taslakları, ürün/kategori/stok, görsel yükleme, filtre/sıralama/sayfalama, kalıcı sepet/takip, başvuru formları ve katalogdan örnek taslak aktarımı frontend'e bağlıdır. Yönetim ve vitrin aynı MongoDB kayıtlarını kullanır. Görseller WebP olarak kalıcı dosya depolamasında, dosya metadata ve mağaza ilişkileri MongoDB'de tutulur.
+Gerçek partner başvuru/onay/sahipliği, katalog/varyant/stok, karşılıklı iş bağlantıları/mesaj/teklif/kampanya, checkout/kupon/ödeme/kargo/iade/finans/para çekme onayı, B2B escrow, AI kredi/iş, CRM ve izinli bildirim batch'leri, doğrulama/adres defteri, referans/yorum/fatura, platform personeli/audit/canlı destek ve partner ekip/destek API'leri eklendi. Günlük satış API'si UTC tahsilat teyidi üzerinden son 1–90 günü verir; eski kaydın bilinmeyen ödeme tarihi uydurulmaz.
 
-24 backend testi ve 4 Playwright testi geçti; lint, typecheck, build ve backend biçim kontrolleri doğrulandı. Playwright kapsamına gerçek CSV dosyası, slug değişikliğinden sonra yeni yönetim adresine yönlendirme ve olmayan gelir verisinin `—` gösterilmesi dahildir. Canlı denemenin adımları, bilinen arayüz sorunu ve eksik ekranlar [live-demo.md](docs/live-demo.md) ve [implementation-review.md](docs/implementation-review.md) içinde kayıtlıdır.
+Adım adım değişiklikler, sınırlar, test sonuçları, ekran/API eşlemesi ve eksik sayfalar: [13 Ekim raporu](docs/implementation-review-2026-10-13.md). [API rota envanteri](docs/api-route-inventory.md), [gateway sözleşmesi](docs/integration-gateway-v1.md), [mimari karar](docs/decisions/005-commerce-and-provider-boundaries.md).
 
-Sipariş/ödeme/kargo/finans, tedarikçi ve influencer yönetim panelleri, başvuru onayı, alıcı hesabı ve SMTP ile şifre yenileme ekranı henüz tamamlanmadı. Başvuru kaydı aktif ortaklık veya panel erişimi oluşturmaz; sepet sipariş değildir. Kaynak koduyla seed komutu ve güvenli örnek ortam dosyaları paylaşılır; yerel `.env`, MongoDB dosyaları, yüklenen medya ve test çıktıları GitHub'a gönderilmez.
+Mevcut frontend'de önceki auth/katalog/ayar/CRM/ekip/destek/sipariş/CMS bağlantıları korunur. Yeni ticari ekranların önemli bölümü hâlâ demo veri ve eski geçici panel kapısı kullanır; backend API'sinin hazır olması ekranın bağlandığı anlamına gelmez. Görsel tasarım bu aşamada değiştirilmedi.
+
+Gateway HTTP adaptörü gerçek vendor SDK'sı değildir. Seçilen ödeme/kargo/banka/AI/mesaj/fiscal sağlayıcıları için bridge/adaptör implementasyonu ve canlı test gerekir. Config veya policy yokken sahte başarı üretilmez. Komisyon/iade/kargo/AI/referans şartları açıkça yapılandırılır. Perakende iade tam sipariş içindir; B2B katalog ithali mağazada stok yaratmaz.
+
+### Platform ve ekip erişimi
+
+Root hesap sunucu CLI'si ile atanır: `npm run admin:role -- grant private-admin@example.com` / `revoke`. CLI hesap oluşturmaz, demo hesabını root yapmayın. Root personel rolünü/sayfa izinlerini/yazma hakkını server API üzerinden yönetir; public profil veya UI rol seçimi yetki vermez. Hesap duraklatma oturumları iptal eder.
+
+Mağaza ekip sözleşmesi owner dahil 50, partner ekibi owner dahil 100 kayıttır. Davetler hash'li, 7 gün süreli ve tek kullanımlıktır; e-postası farklı hesap kabul edemez. Link hazırlamak e-posta göndermek değildir. Mağaza davet sayfası mevcut, partner davet kabul sayfası frontend'de eksiktir. Finans ekibine verilen partner yetkisi okuma içindir; banka değişikliği/para çekme/ekip owner-only, payout review platform finance yetkisine bağlıdır.
 
 ## Yerelde çalıştırma
 
@@ -105,9 +113,10 @@ Tarayıcı harness'i frontend'in `.next` çıktısını yeniden derler. Aynı ch
 
 - `NODE_ENV=production`, HTTPS frontend origin'i, private replica set ve kimlik doğrulanan DB bağlantısı gerekir. API loopback üzerinde dinler; reverse proxy/Next.js aynı makineden erişir. Dağıtım topolojisi değişirse listen/bind politikasını açıkça uyarlayın.
 - Production'da otomatik indeks oluşturulmaz. İlk kurulum ve şema sürümü yükseltmelerinde `npm run db:indexes` çalıştırın. Bu komut `createIndexes` kullanır, mevcut indeksleri veya kayıtları silmez; benzersizlik ihlalleri önce giderilmelidir. Sonraki veri dönüşümleri ayrı migration olarak sürümlenmelidir.
-- `MEDIA_DIRECTORY` kalıcı diske bağlanmalıdır; uygulama klasörünün geçici diski uygun değildir. Çok instance için FileStorage adaptörünün object storage uygulaması gerekir. Medya UUID URL'leri herkese açıktır.
-- SMTP opsiyoneldir; ayarsız şifre kurtarma 503 döner. `MAIL_FROM` ve `SMTP_HOST` birlikte gerekir. Şifre yenileme API'si hazır; `/sifre-sifirla` sayfası henüz yoktur.
-- Rate limit tek process belleğindedir. Next.js proxy'si arkasında istemciler aynı IP kovasına düşebilir. Çok kullanıcılı yayın öncesi güvenilir proxy üzerinden istemci IP'si ve ortak limiter seçimi yapılmalıdır.
-- Ödeme/sipariş/kargo henüz uygulanmadı. Sepet stok ayırmaz; bir alışverişin tamamlandığı anlamına gelmez.
+- `MEDIA_DIRECTORY` kalıcı diske bağlanmalıdır; uygulama klasörünün geçici diski uygun değildir. Çok instance için FileStorage adaptörünün object storage uygulaması gerekir. Ürün medya UUID URL'leri herkese açıktır. `support/` altındaki özel dosyalar bu servisten açılmaz; yetkili download endpointi gerekir.
+- SMTP opsiyoneldir; ayarsız şifre kurtarma 503 döner. `MAIL_FROM` ve `SMTP_HOST` birlikte gerekir. `/sifre-sifirla` sayfası ve gerçek kurtarma formu hazırdır. Gerçek SMTP teslimini kendi ortamınızda doğrulayın; testler SMTP yapılandırılmamış hata ve tek kullanımlık token akışını kapsar.
+- Rate limit MongoDB'de ortak atomic/TTL kovalarındadır. Next.js proxy arkasında istemciler aynı IP kovasına düşebilir; gerçek istemci IP aktarımı güvenli reverse proxy topolojisiyle kurulmalıdır. Rastgele X-Forwarded-For güvenilir sayılmaz. OTP için ayrıca hesap kovaları vardır.
+- Sipariş API'si rezervasyon, ödeme ve sevkiyatın ayrı durumlarını korur; ödeme/kargo gateway portu vardır. Gerçek sağlayıcı adaptörleri gerekir. Sepet tek başına stok ayırmaz; fiyat politikası ve gerçek tahsilat kanıtı olmadan paid olmaz.
+- `WORKERS_ENABLED` normal API'de true; indeks/seed/rol CLI komutları false zorlar. `UPLOAD_CLEANUP_ENABLED` varsayılan false; etkinleşince yalnız yeni/hiç kullanılmamış dosyalar yaş sınırından sonra kaldırılır, kullanılan/legacy dosyalar saklanır.
 
 Boyut/sıkıştırma, filtre ve namespace detayları: [002-platform-routes-and-catalogue-performance.md](docs/decisions/002-platform-routes-and-catalogue-performance.md). Dosyalar MongoDB'de binary olarak saklanmaz; `MEDIA_DIRECTORY` içindeki WebP ve DB metadata birlikte yedeklenmelidir.
