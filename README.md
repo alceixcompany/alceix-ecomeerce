@@ -18,3 +18,5 @@ Geliştirme kuralları: [frontend/AGENTS.md](frontend/AGENTS.md), [backend/AGENT
 Önce MongoDB replica set ve backend'i başlatın; sonra `frontend/` içinde `npm ci`, `.env.example` → `.env.local`, `npm run dev`. Backend 4000, frontend http://localhost:3000. Yeni veritabanında `/kayit-ol` ile kendi mağazanızı oluşturun.
 
 GitHub teslim kapsamı ve yeniden çalıştırılan kontroller: [13 Ekim teslim notu](docs/releases/2026-10-13.md).
+
+Türkiye odaklı Türkçe yatırımcı sunumu (PowerPoint ve PDF): [docs/investor](docs/investor/README.md).
