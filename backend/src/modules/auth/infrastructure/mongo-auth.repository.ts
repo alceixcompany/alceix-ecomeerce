@@ -9,6 +9,7 @@ import type {
 @Injectable()
 export class MongoAuthRepository implements AuthRepository, OnModuleInit {
   private readonly sessions: Model<Session>;
+  private readonly verifications: Model<Reset>;
   private readonly resets: Model<Reset>;
   constructor(
     @Inject(DATABASE) db: Connection,
@@ -32,10 +33,12 @@ export class MongoAuthRepository implements AuthRepository, OnModuleInit {
     );
     this.sessions = db.model<Session>("Session", session);
     this.resets = db.model<Reset>("PasswordReset", reset);
+    this.verifications = db.model<Reset>("EmailVerification", reset.clone());
   }
   async onModuleInit() {
     await this.sessions.init();
     await this.resets.init();
+    await this.verifications.init();
   }
   async createSession(session: Session) {
     await this.sessions.create([session], { session: this.tx.session });
@@ -62,6 +65,23 @@ export class MongoAuthRepository implements AuthRepository, OnModuleInit {
   }
   async consumeReset(hash: string) {
     return this.resets
+      .findOneAndDelete(
+        { hash, expiresAt: { $gt: new Date() } },
+        { session: this.tx.session },
+      )
+      .select("-_id")
+      .lean()
+      .exec();
+  }
+  async saveVerification(reset: Reset) {
+    await this.verifications.updateOne(
+      { userId: reset.userId },
+      { $set: reset },
+      { upsert: true },
+    );
+  }
+  consumeVerification(hash: string) {
+    return this.verifications
       .findOneAndDelete(
         { hash, expiresAt: { $gt: new Date() } },
         { session: this.tx.session },

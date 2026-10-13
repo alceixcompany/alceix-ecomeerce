@@ -1,3 +1,4 @@
+import { ReferralsService } from "../../referrals/application/referrals.service";
 import { Inject, Injectable } from "@nestjs/common";
 import { randomBytes, randomUUID, createHash } from "node:crypto";
 import {
@@ -26,6 +27,7 @@ export class AuthService {
     @Inject(PASSWORDS) private readonly passwords: PasswordHasher,
     @Inject(MAILER) private readonly mailer: ResetMailer,
     private readonly users: UsersService,
+    private readonly referrals: ReferralsService,
     private readonly stores: StoresService,
     @Inject(TRANSACTIONS) private readonly tx: TransactionRunner,
     @Inject(CONFIG) private readonly config: AppConfig,
@@ -34,7 +36,8 @@ export class AuthService {
     name: string;
     email: string;
     password: string;
-    store: string;
+    store?: string;
+    referralCode?: string;
   }) {
     const passwordHash = await this.passwords.hash(input.password);
     return this.tx.run(async () => {
@@ -46,10 +49,16 @@ export class AuthService {
         createdAt: new Date(),
       };
       await this.users.create(user);
-      const store = await this.stores.createOwned(user.id, input.store);
+      if (input.referralCode)
+        await this.referrals.attribute(user.id, user.email, input.referralCode);
+      const store = input.store
+        ? await this.stores.createOwned(user.id, input.store)
+        : null;
       return {
         ...(await this.issue(publicUser(user))),
-        stores: [{ id: store.id, slug: store.slug, name: store.name }],
+        stores: store
+          ? [{ id: store.id, slug: store.slug, name: store.name }]
+          : [],
       };
     });
   }
@@ -75,10 +84,13 @@ export class AuthService {
         "INVALID_CREDENTIALS",
         "E-posta veya şifre hatalı.",
       );
+    if (user.accountControl?.status === "paused") throw unauthorized();
     const issued = await this.issue(publicUser(user));
     return {
       ...issued,
-      stores: (await this.stores.ownedBy(user.id)).map((store) => ({
+      platformAdmin: user.platformAdmin ?? false,
+      platformAccess: this.users.access(user),
+      stores: (await this.stores.accessibleBy(user.id)).map((store) => ({
         id: store.id,
         name: store.name,
         slug: store.slug,
@@ -90,14 +102,19 @@ export class AuthService {
     const session = await this.repository.findSession(digest(token));
     if (!session) return null;
     const user = await this.users.findById(session.userId);
-    return user ? publicUser(user) : null;
+    return user && user.accountControl?.status !== "paused"
+      ? publicUser(user)
+      : null;
   }
   async me(token?: string) {
     const user = await this.actor(token);
     if (!user) throw unauthorized();
     return {
       user,
-      stores: (await this.stores.ownedBy(user.id)).map((store) => ({
+      platformAccess: this.users.access((await this.users.findById(user.id))!),
+      platformAdmin:
+        (await this.users.findById(user.id))?.platformAdmin ?? false,
+      stores: (await this.stores.accessibleBy(user.id)).map((store) => ({
         id: store.id,
         name: store.name,
         slug: store.slug,
@@ -145,5 +162,50 @@ export class AuthService {
       await this.repository.deleteUserSessions(reset.userId);
     });
     return { message: "Şifreniz yenilendi. Yeniden giriş yapın." };
+  }
+  async sendVerification(userId: string) {
+    if (!this.mailer.isConfigured())
+      throw unavailable("E-posta doğrulama servisi yapılandırılmadı.");
+    const user = await this.users.findById(userId);
+    if (!user) throw unauthorized();
+    if (user.emailVerifiedAt)
+      return { message: "E-posta adresiniz doğrulanmış." };
+    const token = randomBytes(32).toString("hex");
+    await this.repository.saveVerification({
+      hash: digest(token),
+      userId,
+      expiresAt: new Date(Date.now() + 30 * 60000),
+    });
+    try {
+      await this.mailer.sendVerification(user.email, token);
+    } catch {
+      throw unavailable("E-posta doğrulama iletisi gönderilemedi.");
+    }
+    return { message: "Doğrulama bağlantısı gönderildi." };
+  }
+  async verifyEmail(token: string) {
+    await this.tx.run(async () => {
+      const verification = await this.repository.consumeVerification(
+        digest(token),
+      );
+      if (!verification)
+        throw new AppError(
+          422,
+          "INVALID_VERIFICATION",
+          "Doğrulama bağlantısı geçersiz veya süresi dolmuş.",
+        );
+      await this.users.verifyEmail(verification.userId);
+    });
+    return { message: "E-posta adresi doğrulandı." };
+  }
+  async verifiedActor(token?: string) {
+    const actor = await this.actor(token);
+    return actor && (await this.users.findById(actor.id))?.emailVerifiedAt
+      ? actor
+      : null;
+  }
+
+  revokeUserSessions(userId: string) {
+    return this.repository.deleteUserSessions(userId);
   }
 }

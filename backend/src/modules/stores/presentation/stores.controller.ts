@@ -48,14 +48,14 @@ export class StoresController {
   ) {}
   @Get() async get(@Param("slug") slug: string, @Req() request: AuthRequest) {
     return this.stores.profile(
-      await this.stores.owned(slug, request.actor!.id),
+      await this.stores.owned(slug, request.actor!.id, "read"),
     );
   }
   @Get("settings/draft") async draft(
     @Param("slug") slug: string,
     @Req() request: AuthRequest,
   ) {
-    const store = await this.stores.owned(slug, request.actor!.id);
+    const store = await this.stores.owned(slug, request.actor!.id, "read");
     return { settings: store.draft ?? null, version: store.version };
   }
   @Put("settings") @ApiInput(saveSchema) save(
@@ -79,11 +79,17 @@ export class StoresController {
     draft: boolean,
   ) {
     const { version, ...settings } = parse(saveSchema, body),
-      store = await this.stores.owned(slug, userId);
+      store = await this.stores.owned(slug, userId, "settings-write");
     await this.media.assertOwned(store.id, [settings.bannerImage], "banner");
     await this.media.assertOwned(store.id, [settings.logoImage], "logo");
     await this.media.assertOwned(store.id, [settings.faviconImage], "favicon");
     const saved = await this.stores.save(store, settings, version, draft);
     return { ...settingsOf(saved), id: saved.id, version: saved.version };
+  }
+  @Get("capabilities") capabilities(
+    @Param("slug") slug: string,
+    @Req() req: AuthRequest,
+  ) {
+    return this.stores.capabilities(slug, req.actor!.id);
   }
 }

@@ -15,7 +15,8 @@
     "db:indexes": "node --env-file-if-exists=.env -r ts-node/register src/infrastructure/create-indexes.ts",
     "db:seed": "node --env-file-if-exists=.env -r ts-node/register src/infrastructure/seed-demo.ts",
     "format": "prettier --write src test",
-    "format:check": "prettier --check src test"
+    "format:check": "prettier --check src test",
+    "admin:role": "node --env-file-if-exists=.env -r ts-node/register src/infrastructure/platform-admin.ts"
   },
   "dependencies": {
     "@nestjs/common": "^12.1.2",

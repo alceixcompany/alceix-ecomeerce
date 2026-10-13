@@ -34,4 +34,16 @@ export class SmtpMailer implements ResetMailer {
       text: `Şifrenizi yenilemek için bağlantı: ${url.toString()}\nBu bağlantı 30 dakika geçerlidir. Talebi siz yapmadıysanız yok sayabilirsiniz.`,
     });
   }
+  async sendVerification(email: string, token: string) {
+    if (!this.transporter || !this.config.smtp)
+      throw unavailable("E-posta doğrulama servisi yapılandırılmadı.");
+    const url = new URL("/eposta-dogrula", this.config.frontendOrigin);
+    url.searchParams.set("token", token);
+    await this.transporter.sendMail({
+      from: this.config.smtp.from,
+      to: email,
+      subject: "Alceix e-posta doğrulama",
+      text: `E-posta adresinizi doğrulamak için: ${url.toString()}\nBağlantı 30 dakika geçerlidir.`,
+    });
+  }
 }

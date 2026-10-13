@@ -36,6 +36,21 @@ const productSchema = z
     currency: z.literal("TRY").default("TRY"),
     stock: z.number().int().min(0).max(9_999_999),
     variants: z.array(text(40).min(1)).max(30),
+    options: z
+      .array(
+        z
+          .object({
+            id: idSchema,
+            name: text(40).min(1),
+            sku: text(50).min(1),
+            priceCents: moneySchema,
+            stock: z.number().int().min(0).max(9999999),
+          })
+          .strict(),
+      )
+      .min(1)
+      .max(30)
+      .optional(),
     images: z.array(text(200).min(1)).max(6),
     status: z.enum(["live", "draft"]),
     model: z.enum(["own", "supplier"]),
@@ -46,6 +61,8 @@ const productSchema = z
 const updateSchema = productSchema.extend({ version: z.number().int().min(0) });
 const stockSchema = z
   .object({
+    requestId: idSchema.optional(),
+    variant: idSchema.optional(),
     amount: z
       .number()
       .int()
@@ -69,7 +86,11 @@ export class CatalogController {
     private readonly stores: StoresService,
   ) {}
   private store(slug: string, request: AuthRequest) {
-    return this.stores.owned(slug, request.actor!.id);
+    return this.stores.owned(
+      slug,
+      request.actor!.id,
+      request.method === "GET" ? "catalog-read" : "catalog-write",
+    );
   }
   @Get("products") async list(
     @Param("slug") slug: string,
@@ -135,6 +156,9 @@ export class CatalogController {
       (await this.store(slug, request)).id,
       parse(idSchema, id),
       parse(stockSchema, body).amount,
+      parse(stockSchema, body).variant,
+      parse(stockSchema, body).requestId,
+      request.actor!.id,
     );
   }
   @Post("sample-products") @ApiInput(sampleSchema) async importSample(

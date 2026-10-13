@@ -1,3 +1,11 @@
+export type ProductOption = {
+  id: string;
+  name: string;
+  sku: string;
+  priceCents: number;
+  stock: number;
+  reservedStock: number;
+};
 export type Product = {
   id: string;
   storeId: string;
@@ -11,7 +19,9 @@ export type Product = {
   costCents: number;
   currency: "TRY";
   stock: number;
+  reservedStock?: number;
   variants: string[];
+  options?: ProductOption[];
   images: string[];
   status: "live" | "draft";
   model: "own" | "supplier";
@@ -22,8 +32,14 @@ export type Product = {
 };
 export type ProductInput = Omit<
   Product,
-  "id" | "storeId" | "categoryId" | "version" | "createdAt"
->;
+  | "id"
+  | "storeId"
+  | "categoryId"
+  | "version"
+  | "createdAt"
+  | "reservedStock"
+  | "options"
+> & { options?: Omit<ProductOption, "reservedStock">[] };
 export type Category = {
   id: string;
   storeId: string;

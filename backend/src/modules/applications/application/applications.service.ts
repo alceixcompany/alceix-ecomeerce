@@ -10,8 +10,26 @@ export class ApplicationsService {
   constructor(
     @Inject(APPLICATIONS) private readonly repository: ApplicationsRepository,
   ) {}
-  async submit(type: Application["type"], payload: Record<string, string>) {
+  list(page: number, limit: number) {
+    return this.repository.list(page, limit);
+  }
+  get(id: string) {
+    return this.repository.find(id);
+  }
+  save(application: Application, version: number) {
+    return this.repository.save(application, version);
+  }
+  owned(ownerId: string) {
+    return this.repository.owned(ownerId);
+  }
+  async submit(
+    type: Application["type"],
+    payload: Record<string, string>,
+    ownerId?: string,
+  ) {
     const application: Application = {
+      ownerId,
+      version: 0,
       id: randomUUID(),
       type,
       status: "pending",

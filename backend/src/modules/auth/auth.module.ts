@@ -1,3 +1,5 @@
+import { ReferralsModule } from "../referrals/referrals.module";
+import { PlatformGuard } from "./presentation/platform.guard";
 import { Global, Module } from "@nestjs/common";
 import { UsersModule } from "../users/users.module";
 import { StoresModule } from "../stores/stores.module";
@@ -14,15 +16,16 @@ import { AuthController } from "./presentation/auth.controller";
 import { SessionGuard } from "./presentation/session.guard";
 @Global()
 @Module({
-  imports: [UsersModule, StoresModule],
+  imports: [ReferralsModule, UsersModule, StoresModule],
   controllers: [AuthController],
   providers: [
     AuthService,
     SessionGuard,
+    PlatformGuard,
     { provide: AUTH_REPOSITORY, useClass: MongoAuthRepository },
     { provide: PASSWORDS, useClass: ScryptPasswords },
     { provide: MAILER, useClass: SmtpMailer },
   ],
-  exports: [AuthService, SessionGuard],
+  exports: [AuthService, SessionGuard, PlatformGuard],
 })
 export class AuthModule {}

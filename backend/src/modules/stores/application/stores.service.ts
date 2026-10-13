@@ -1,3 +1,4 @@
+import { storeCapabilities } from "../domain/membership";
 import { Inject, Injectable } from "@nestjs/common";
 import { randomUUID } from "node:crypto";
 import { STORES, type StoresRepository } from "./stores.repository";
@@ -9,9 +10,14 @@ import {
   slugify,
 } from "../domain/store";
 import { conflict, notFound } from "../../../shared/errors";
+import { TeamService } from "./team.service";
+import type { StoreCapability } from "../domain/membership";
 @Injectable()
 export class StoresService {
-  constructor(@Inject(STORES) private readonly repository: StoresRepository) {}
+  constructor(
+    @Inject(STORES) private readonly repository: StoresRepository,
+    private readonly team: TeamService,
+  ) {}
   async createOwned(ownerId: string, name: string) {
     const base = slugify(name),
       suffix = randomUUID().slice(0, 8);
@@ -40,17 +46,48 @@ export class StoresService {
     await this.repository.create(store);
     return store;
   }
+  adminList(q: string, page: number, limit: number) {
+    return this.repository.adminList(q, page, limit);
+  }
+  async accessibleBy(userId: string) {
+    const owned = await this.repository.ownedBy(userId),
+      ids = await this.team.storeIds(userId);
+    const additional = await Promise.all(
+      ids
+        .filter((id) => !owned.some((store) => store.id === id))
+        .map((id) => this.repository.findById(id)),
+    );
+    return [
+      ...owned,
+      ...additional.filter((store): store is Store => store !== null),
+    ];
+  }
   ownedBy(userId: string) {
     return this.repository.ownedBy(userId);
   }
-  async owned(slug: string, userId: string) {
+  async owned(
+    slug: string,
+    userId: string,
+    permission: StoreCapability = "owner",
+  ) {
     const store = await this.repository.findBySlug(slug);
-    if (!store || store.ownerId !== userId) throw notFound();
+    if (
+      !store ||
+      store.platformSuspended ||
+      (store.ownerId !== userId &&
+        !(await this.team.can(store.id, userId, permission)))
+    )
+      throw notFound();
+    return store;
+  }
+  async bySlug(slug: string) {
+    const store = await this.repository.findBySlug(slug);
+    if (!store) throw notFound();
     return store;
   }
   async publicBySlug(slug: string) {
     const store = await this.repository.findBySlug(slug);
-    if (!store) throw notFound();
+    if (!store || store.platformSuspended) throw notFound();
     return store;
   }
   async byId(id: string) {
@@ -77,5 +114,19 @@ export class StoresService {
   }
   profile(store: Store) {
     return { ...settingsOf(store), id: store.id, version: store.version };
+  }
+  suspendOwner(ownerId: string, suspended: boolean) {
+    return this.repository.suspendOwner(ownerId, suspended);
+  }
+  async capabilities(slug: string, userId: string) {
+    const store = await this.owned(slug, userId, "read");
+    return {
+      storeId: store.id,
+      owner: store.ownerId === userId,
+      permissions:
+        store.ownerId === userId
+          ? storeCapabilities
+          : await this.team.capabilities(store.id, userId),
+    };
   }
 }

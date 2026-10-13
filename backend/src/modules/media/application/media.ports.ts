@@ -2,12 +2,16 @@ export type Media = {
   id: string;
   storeId: string;
   kind: "product" | "banner" | "logo" | "favicon";
+  lifecycle?: "unclaimed" | "retained" | "deleting";
   createdAt: Date;
   size: number;
 };
 export const MEDIA_RECORDS = Symbol("MEDIA_RECORDS"),
   FILES = Symbol("FILES");
 export interface MediaRepository {
+  retain(id: string): Promise<boolean>;
+  garbage(cutoff: Date): Promise<Media | null>;
+  removeRecord(id: string): Promise<void>;
   create(media: Media): Promise<void>;
   byId(id: string): Promise<Media | null>;
 }

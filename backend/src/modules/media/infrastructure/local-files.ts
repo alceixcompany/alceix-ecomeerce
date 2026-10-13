@@ -18,6 +18,8 @@ export class LocalFiles implements FileStorage {
     return readFile(this.path(id));
   }
   async remove(id: string) {
-    await unlink(this.path(id)).catch(() => undefined);
+    await unlink(this.path(id)).catch((error) => {
+      if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+    });
   }
 }

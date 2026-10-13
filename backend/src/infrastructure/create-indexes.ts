@@ -3,7 +3,9 @@ import { loadConfig } from "../config/config";
 import { DATABASE } from "./database";
 import type { Connection } from "mongoose";
 async function main() {
-  const app = await createApp(loadConfig());
+  const app = await createApp(
+    loadConfig({ ...process.env, WORKERS_ENABLED: "false" }),
+  );
   try {
     const db = app.get<Connection>(DATABASE);
     for (const model of Object.values(db.models)) await model.createIndexes();

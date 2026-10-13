@@ -21,7 +21,7 @@ import {
   sessionToken,
 } from "../../auth/presentation/session.guard";
 import type { AuthRequest } from "../../../shared/http";
-import { ApiInput, parse, idSchema } from "../../../shared/validation";
+import { ApiInput, parse, idSchema, text } from "../../../shared/validation";
 import { Inject } from "@nestjs/common";
 import { CONFIG, type AppConfig } from "../../../config/config";
 const cartSchema = z
@@ -33,13 +33,16 @@ const cartSchema = z
           .object({
             productId: idSchema,
             quantity: z.number().int().min(1).max(99),
+            variant: text(40).optional(),
           })
           .strict(),
       )
       .max(100)
       .refine(
         (lines) =>
-          new Set(lines.map((line) => line.productId)).size === lines.length,
+          new Set(
+            lines.map((line) => `${line.productId}:${line.variant ?? ""}`),
+          ).size === lines.length,
       ),
   })
   .strict();
@@ -84,12 +87,14 @@ export class EngagementController {
     @Res({ passthrough: true }) response: Response,
     @Body() body: unknown,
   ) {
-    const input = parse(cartSchema, body);
+    const input = parse(cartSchema, body),
+      actor = await this.auth.verifiedActor(sessionToken(request));
     return this.engagement.saveCart(
       this.cartKey(request, response),
       (await this.stores.publicBySlug(slug)).id,
       input.lines,
       input.version,
+      actor ? { buyerId: actor.id, email: actor.email } : undefined,
     );
   }
   @Get("follow") async followed(

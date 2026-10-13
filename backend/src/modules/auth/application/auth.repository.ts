@@ -2,6 +2,8 @@ export type Session = { hash: string; userId: string; expiresAt: Date };
 export type Reset = { hash: string; userId: string; expiresAt: Date };
 export const AUTH_REPOSITORY = Symbol("AUTH_REPOSITORY");
 export interface AuthRepository {
+  saveVerification(reset: Reset): Promise<void>;
+  consumeVerification(hash: string): Promise<Reset | null>;
   createSession(session: Session): Promise<void>;
   findSession(hash: string): Promise<Session | null>;
   deleteSession(hash: string): Promise<void>;
@@ -17,5 +19,6 @@ export interface PasswordHasher {
 export const MAILER = Symbol("MAILER");
 export interface ResetMailer {
   isConfigured(): boolean;
+  sendVerification(email: string, token: string): Promise<void>;
   sendReset(email: string, token: string): Promise<void>;
 }

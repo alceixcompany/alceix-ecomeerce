@@ -13,7 +13,11 @@ import { randomUUID } from "node:crypto";
 import { AppError } from "./errors";
 import { CONFIG, type AppConfig } from "../config/config";
 export type Actor = { id: string; name: string; email: string };
-export type AuthRequest = Request & { actor?: Actor; requestId?: string };
+export type AuthRequest = Request & {
+  actor?: Actor;
+  requestId?: string;
+  rawBody?: Buffer;
+};
 @Catch()
 export class ErrorFilter implements ExceptionFilter {
   catch(error: unknown, host: ArgumentsHost) {
@@ -63,6 +67,10 @@ export class OriginGuard implements CanActivate {
   canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest<Request>();
     if (
+      !(
+        request.method === "POST" &&
+        request.path === "/api/v1/integrations/events"
+      ) &&
       !["GET", "HEAD", "OPTIONS"].includes(request.method) &&
       request.get("origin") !== this.config.frontendOrigin
     )

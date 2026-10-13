@@ -4,6 +4,7 @@ import { ApplicationsService } from "./application/applications.service";
 import { MongoApplicationsRepository } from "./infrastructure/mongo-applications.repository";
 import { ApplicationsController } from "./presentation/applications.controller";
 @Module({
+  exports: [ApplicationsService],
   controllers: [ApplicationsController],
   providers: [
     ApplicationsService,

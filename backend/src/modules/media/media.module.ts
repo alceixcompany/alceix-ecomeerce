@@ -1,3 +1,4 @@
+import { MediaCleanupWorker } from "./infrastructure/media-cleanup.worker";
 import { Module } from "@nestjs/common";
 import { StoresModule } from "../stores/stores.module";
 import { FILES, MEDIA_RECORDS, IMAGES } from "./application/media.ports";
@@ -10,11 +11,12 @@ import { MediaController } from "./presentation/media.controller";
   imports: [StoresModule],
   controllers: [MediaController],
   providers: [
+    MediaCleanupWorker,
     MediaService,
     { provide: IMAGES, useClass: SharpImages },
     { provide: FILES, useClass: LocalFiles },
     { provide: MEDIA_RECORDS, useClass: MongoMediaRepository },
   ],
-  exports: [MediaService],
+  exports: [MediaService, IMAGES],
 })
 export class MediaModule {}

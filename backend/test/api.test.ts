@@ -8,7 +8,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createHash } from "node:crypto";
 import sharp from "sharp";
-import { createApp } from "../src/bootstrap";
+import { createTestApp as createApp } from "./test-app";
 import { loadConfig, type AppConfig } from "../src/config/config";
 import { DATABASE } from "../src/infrastructure/database";
 import { StoresService } from "../src/modules/stores/application/stores.service";
@@ -456,8 +456,10 @@ test("dashboard derives inventory and does not invent financial results", async 
     summary.body.inventory.all,
     await db.models.Product.countDocuments({ storeId: store.id }),
   );
-  assert.equal(summary.body.finance, null);
-  assert.equal(summary.body.sales, null);
+  assert.equal(summary.body.finance.availableCents, 0);
+  assert.equal(summary.body.finance.pendingCents, 0);
+  assert.equal(summary.body.sales.paidOrders, 0);
+  assert.equal(summary.body.sales.paidCents, 0);
 });
 test("password reset is one-time, revokes sessions, and unavailable SMTP is explicit", async () => {
   await api()

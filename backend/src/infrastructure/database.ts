@@ -1,9 +1,10 @@
+import { RateLimiter } from "./rate-limiter";
 import {
   Global,
   Module,
   Inject,
   Injectable,
-  OnModuleDestroy,
+  OnApplicationShutdown,
 } from "@nestjs/common";
 import { AsyncLocalStorage } from "node:async_hooks";
 import {
@@ -12,7 +13,8 @@ import {
   type ClientSession,
 } from "mongoose";
 import { CONFIG, type AppConfig } from "../config/config";
-export const DATABASE = Symbol("DATABASE");
+import { DATABASE } from "./database-token";
+export { DATABASE } from "./database-token";
 import { TRANSACTIONS, type TransactionRunner } from "../shared/transactions";
 @Injectable()
 export class MongoTransactions implements TransactionRunner {
@@ -27,9 +29,9 @@ export class MongoTransactions implements TransactionRunner {
   }
 }
 @Injectable()
-class ConnectionLifecycle implements OnModuleDestroy {
+class ConnectionLifecycle implements OnApplicationShutdown {
   constructor(@Inject(DATABASE) private readonly db: Connection) {}
-  async onModuleDestroy() {
+  async onApplicationShutdown() {
     await this.db.close();
   }
 }
@@ -56,9 +58,10 @@ class ConnectionLifecycle implements OnModuleDestroy {
       },
     },
     MongoTransactions,
+    RateLimiter,
     { provide: TRANSACTIONS, useExisting: MongoTransactions },
     ConnectionLifecycle,
   ],
-  exports: [DATABASE, TRANSACTIONS, MongoTransactions],
+  exports: [DATABASE, TRANSACTIONS, MongoTransactions, RateLimiter],
 })
 export class DatabaseModule {}

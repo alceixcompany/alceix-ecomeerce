@@ -1,6 +1,6 @@
 import { Inject, Injectable, OnModuleInit } from "@nestjs/common";
 import { Schema, type Connection, type Model } from "mongoose";
-import { DATABASE } from "../../../infrastructure/database";
+import { DATABASE, MongoTransactions } from "../../../infrastructure/database";
 import type {
   Cart,
   CartLine,
@@ -13,12 +13,19 @@ export class MongoEngagementRepository
 {
   private readonly carts: Model<Cart>;
   private readonly follows: Model<Follow>;
-  constructor(@Inject(DATABASE) db: Connection) {
+  constructor(
+    @Inject(DATABASE) db: Connection,
+    private readonly tx: MongoTransactions,
+  ) {
     const cart = new Schema<Cart>(
       {
         hash: String,
         storeId: String,
-        lines: [{ _id: false, productId: String, quantity: Number }],
+        lines: [
+          { _id: false, productId: String, quantity: Number, variant: String },
+        ],
+        buyerId: String,
+        email: String,
         version: Number,
         expiresAt: { type: Date, expires: 0 },
       },
@@ -39,11 +46,14 @@ export class MongoEngagementRepository
   }
   async cart(hash: string, storeId: string) {
     // Check expiry ourselves; MongoDB TTL cleanup is asynchronous.
-    await this.carts.deleteOne({
-      hash,
-      storeId,
-      expiresAt: { $lte: new Date() },
-    });
+    await this.carts.deleteOne(
+      {
+        hash,
+        storeId,
+        expiresAt: { $lte: new Date() },
+      },
+      { session: this.tx.session },
+    );
     return (await this.carts
       .findOneAndUpdate(
         { hash, storeId },
@@ -51,7 +61,7 @@ export class MongoEngagementRepository
           $setOnInsert: { lines: [], version: 0 },
           $set: { expiresAt: new Date(Date.now() + 30 * 86400000) },
         },
-        { upsert: true, returnDocument: "after" },
+        { upsert: true, returnDocument: "after", session: this.tx.session },
       )
       .select("-_id")
       .lean()
@@ -62,12 +72,17 @@ export class MongoEngagementRepository
     storeId: string,
     lines: CartLine[],
     version: number,
+    identity?: { buyerId: string; email: string },
   ) {
     return this.carts
       .findOneAndUpdate(
         { hash, storeId, version, expiresAt: { $gt: new Date() } },
-        { $set: { lines }, $inc: { version: 1 } },
-        { returnDocument: "after" },
+        {
+          $set: { lines, ...(identity ?? {}) },
+          ...(identity ? {} : { $unset: { buyerId: 1, email: 1 } }),
+          $inc: { version: 1 },
+        },
+        { returnDocument: "after", session: this.tx.session },
       )
       .select("-_id")
       .lean()

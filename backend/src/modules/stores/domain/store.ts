@@ -18,16 +18,25 @@ export type StoreSettings = {
 export type Store = StoreSettings & {
   id: string;
   ownerId: string;
+  platformSuspended?: boolean;
   version: number;
   createdAt: Date;
   draft?: StoreSettings;
 };
 export const reservedSlugs = new Set([
+  "partner-ekip-daveti",
+  "eposta-dogrula",
+  "banka-dogrulama-sonucu",
+  "hesabim",
+  "iletisim-tercihleri",
+  "odeme-sonucu",
+  "ai-kredi-sonucu",
   "api",
   "tedarikci",
   "influencer",
   "admin",
   "giris-yap",
+  "sifremi-unuttum",
   "kayit-ol",
   "hakkimizda",
   "blog",
@@ -48,6 +57,7 @@ export const reservedSlugs = new Set([
   "platform-ozellikleri",
   "uploads",
   "sifre-sifirla",
+  "ekip-daveti",
 ]);
 export function slugify(name: string): string {
   return (

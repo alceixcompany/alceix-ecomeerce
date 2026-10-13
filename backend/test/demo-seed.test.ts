@@ -4,7 +4,7 @@ import { loadConfig } from "../src/config/config";
 import { assertDemoDatabase } from "../src/infrastructure/demo-seed";
 import { seedDemo } from "../src/infrastructure/demo-seed";
 import { mongoFixture } from "./mongo-fixture";
-import { createApp } from "../src/bootstrap";
+import { createTestApp as createApp } from "./test-app";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";

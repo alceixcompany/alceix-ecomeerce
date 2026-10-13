@@ -1,3 +1,24 @@
+import { ReferralsModule } from "./modules/referrals/referrals.module";
+import { LiveSupportModule } from "./modules/live-support/live-support.module";
+import { StudioModule } from "./modules/studio/studio.module";
+import { NotificationsModule } from "./modules/notifications/notifications.module";
+import { WholesaleModule } from "./modules/wholesale/wholesale.module";
+import { CouponsModule } from "./modules/coupons/coupons.module";
+import { ReviewsModule } from "./modules/reviews/reviews.module";
+import { AccountsModule } from "./modules/accounts/accounts.module";
+import { CommerceModule } from "./modules/commerce/commerce.module";
+import { FinanceModule } from "./modules/finance/finance.module";
+import { JobsModule } from "./modules/jobs/jobs.module";
+import { IntegrationsModule } from "./modules/integrations/integrations.module";
+import { CollaborationModule } from "./modules/collaboration/collaboration.module";
+import { PartnersModule } from "./modules/partners/partners.module";
+import { AuditModule } from "./modules/audit/audit.module";
+import { PlatformModule } from "./modules/platform/platform.module";
+import { OrdersModule } from "./modules/orders/orders.module";
+import { DesignModule } from "./modules/design/design.module";
+import { CrmModule } from "./modules/crm/crm.module";
+import { SupportModule } from "./modules/support/support.module";
+import { ContactModule } from "./modules/contact/contact.module";
 import {
   DynamicModule,
   Global,
@@ -52,12 +73,33 @@ export class AppModule {
       imports: [
         ConfigurationModule.register(config),
         DatabaseModule,
+        AuditModule,
+        PartnersModule,
+        CollaborationModule,
+        IntegrationsModule,
+        JobsModule,
+        FinanceModule,
+        CommerceModule,
+        AccountsModule,
+        ReviewsModule,
+        CouponsModule,
+        WholesaleModule,
+        NotificationsModule,
+        StudioModule,
         AuthModule,
         StoresApiModule,
         CatalogModule,
         ApplicationsModule,
         EngagementModule,
         DashboardModule,
+        CrmModule,
+        SupportModule,
+        ContactModule,
+        PlatformModule,
+        ReferralsModule,
+        LiveSupportModule,
+        OrdersModule,
+        DesignModule,
       ],
       controllers: [HealthController],
       providers: [{ provide: APP_GUARD, useClass: OriginGuard }],

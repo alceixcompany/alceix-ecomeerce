@@ -33,6 +33,7 @@ export class MongoStoresRepository implements StoresRepository, OnModuleInit {
         id: { type: String, unique: true },
         slug: { type: String, unique: true, required: true },
         ownerId: { type: String, required: true, index: true },
+        platformSuspended: Boolean,
         version: Number,
         createdAt: Date,
         draft: new Schema(settings, { _id: false }),
@@ -63,8 +64,45 @@ export class MongoStoresRepository implements StoresRepository, OnModuleInit {
       .lean()
       .exec();
   }
+  async adminList(q: string, requestedPage: number, limit: number) {
+    const filter = q
+      ? {
+          $or: [
+            {
+              name: {
+                $regex: q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+                $options: "i",
+              },
+            },
+            {
+              slug: {
+                $regex: q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+                $options: "i",
+              },
+            },
+          ],
+        }
+      : {};
+    const total = await this.model.countDocuments(filter),
+      pages = Math.max(1, Math.ceil(total / limit)),
+      page = Math.min(requestedPage, pages);
+    const items = await this.model
+      .find(filter)
+      .sort({ createdAt: -1, id: 1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .select("-_id")
+      .lean()
+      .exec();
+    return { items, total, page, pages };
+  }
   async ownedBy(ownerId: string) {
-    return this.model.find({ ownerId }).select("-_id").lean().exec();
+    return this.model
+      .find({ ownerId })
+      .session(this.tx.session ?? null)
+      .select("-_id")
+      .lean()
+      .exec();
   }
   async update(
     id: string,
@@ -78,10 +116,21 @@ export class MongoStoresRepository implements StoresRepository, OnModuleInit {
         draft
           ? { $set: { draft: settings }, $inc: { version: 1 } }
           : { $set: settings, $unset: { draft: 1 }, $inc: { version: 1 } },
-        { returnDocument: "after", runValidators: true },
+        {
+          returnDocument: "after",
+          runValidators: true,
+          session: this.tx.session,
+        },
       )
       .select("-_id")
       .lean()
       .exec();
+  }
+  async suspendOwner(ownerId: string, suspended: boolean) {
+    await this.model.updateMany(
+      { ownerId },
+      { $set: { platformSuspended: suspended }, $inc: { version: 1 } },
+      { session: this.tx.session },
+    );
   }
 }

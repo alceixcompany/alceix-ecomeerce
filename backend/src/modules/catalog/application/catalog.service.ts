@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { randomUUID } from "node:crypto";
 import { CATALOG, type CatalogRepository } from "./catalog.repository";
-import type { ProductInput, Product } from "../domain/product";
+import type { ProductInput, Product, ProductOption } from "../domain/product";
 import type { ListQuery } from "../domain/list-query";
 import { AppError, notFound, conflict } from "../../../shared/errors";
 import { MediaService } from "../../media/application/media.service";
@@ -46,8 +46,11 @@ export class CatalogService {
         storeId,
         input.category,
       );
+      const options = this.options(input);
       const product: Product = {
         ...input,
+        options,
+        variants: options?.map((option) => option.name) ?? input.variants,
         id: randomUUID(),
         storeId,
         category: category.name,
@@ -55,6 +58,13 @@ export class CatalogService {
         version: 0,
         createdAt: new Date(),
       };
+      if (
+        !(await this.repository.claimSkus(storeId, product.id, [
+          product.sku,
+          ...(product.options?.map((option) => option.sku) ?? []),
+        ]))
+      )
+        throw conflict("SKU başka bir ürüne ait.");
       await this.repository.create(product);
       return product;
     });
@@ -69,6 +79,14 @@ export class CatalogService {
     return this.tx.run(async () => {
       const existing = await this.product(storeId, id);
       if (existing.version !== version) throw conflict();
+      const options = this.options(input, existing);
+      if (
+        !(await this.repository.claimSkus(storeId, id, [
+          input.sku,
+          ...(options?.map((option) => option.sku) ?? []),
+        ]))
+      )
+        throw conflict("SKU başka bir ürüne ait.");
       const category = await this.repository.ensureCategory(
         storeId,
         input.category,
@@ -77,6 +95,8 @@ export class CatalogService {
         {
           ...existing,
           ...input,
+          options,
+          variants: options?.map((option) => option.name) ?? input.variants,
           category: category.name,
           categoryId: category.id,
         },
@@ -147,6 +167,7 @@ export class CatalogService {
       currency,
       stock,
       variants,
+      options,
       images,
       model,
       seoTitle,
@@ -163,6 +184,11 @@ export class CatalogService {
       currency,
       stock,
       variants,
+      options: options?.map((option) => ({
+        ...option,
+        id: randomUUID(),
+        sku: `${option.sku.slice(0, 40)}-${randomUUID().slice(0, 8)}`,
+      })),
       images,
       model,
       seoTitle,
@@ -170,12 +196,125 @@ export class CatalogService {
       status: "draft",
     });
   }
-  async adjustStock(storeId: string, id: string, amount: number) {
-    const result = await this.repository.adjustStock(storeId, id, amount);
+  async adjustStock(
+    storeId: string,
+    id: string,
+    amount: number,
+    variant?: string,
+    requestId?: string,
+    actorId?: string,
+  ) {
+    const result = await this.repository.adjustStock(
+      storeId,
+      id,
+      amount,
+      variant,
+      requestId,
+      actorId,
+    );
     if (!result) {
       await this.product(storeId, id);
       throw conflict("Stok yetersiz veya miktar sınırı aşıldı.");
     }
     return result;
+  }
+  async reserve(
+    storeId: string,
+    id: string,
+    quantity: number,
+    variant?: string,
+  ) {
+    const product = await this.repository.reserve(
+      storeId,
+      id,
+      quantity,
+      variant,
+    );
+    if (!product) throw conflict("Ürün satışta değil veya yeterli stok yok.");
+    return product;
+  }
+  async release(
+    storeId: string,
+    id: string,
+    quantity: number,
+    variant?: string,
+  ) {
+    const product = await this.repository.release(
+      storeId,
+      id,
+      quantity,
+      variant,
+    );
+    if (!product) throw conflict("Stok rezervasyonu geri bırakılamadı.");
+    return product;
+  }
+  async consume(
+    storeId: string,
+    id: string,
+    quantity: number,
+    variant?: string,
+  ) {
+    if (!(await this.repository.consume(storeId, id, quantity, variant)))
+      throw conflict("Rezervasyon tüketilemedi.");
+  }
+  async restock(
+    storeId: string,
+    id: string,
+    quantity: number,
+    variant?: string,
+  ) {
+    if (!(await this.repository.restock(storeId, id, quantity, variant)))
+      throw conflict("İade stoğu sınırı aşıyor.");
+  }
+
+  private options(
+    input: ProductInput,
+    current?: Product,
+  ): ProductOption[] | undefined {
+    if (current && !current.options?.length && input.options?.length)
+      throw conflict(
+        "Varyant stok modeli yeni ürün oluşturulurken seçilir; geçmiş stoğu otomatik dönüştürmeyin.",
+      );
+    const requested = input.options ?? current?.options;
+    if (!requested?.length) return undefined;
+    const keys = requested.map((option) =>
+      option.sku.toLocaleLowerCase("tr-TR"),
+    );
+    if (
+      new Set(requested.map((o) => o.id)).size !== requested.length ||
+      new Set(requested.map((o) => o.name)).size !== requested.length ||
+      new Set([input.sku.toLocaleLowerCase("tr-TR"), ...keys]).size !==
+        requested.length + 1
+    )
+      throw conflict("Varyant kimliği, adı ve SKU benzersiz olmalı.");
+    if (
+      current?.options?.some(
+        (old) =>
+          !requested.some(
+            (option) => option.id === old.id && option.sku === old.sku,
+          ),
+      )
+    )
+      throw conflict(
+        "Geçmiş varyant kimliği/SKU korunmalı; satışını stokla yönetin.",
+      );
+    const options = requested.map((option) => ({
+      ...option,
+      reservedStock:
+        current?.options?.find((old) => old.id === option.id)?.reservedStock ??
+        0,
+    }));
+    if (
+      options.reduce((sum, option) => sum + option.stock, 0) !== input.stock ||
+      options.reduce(
+        (sum, option) => sum + option.stock + option.reservedStock,
+        0,
+      ) > 9999999 ||
+      Math.min(...options.map((o) => o.priceCents)) !== input.priceCents
+    )
+      throw conflict(
+        "Toplam kullanılabilir stok varyantların toplamı, vitrin fiyatı en düşük varyant fiyatı olmalı.",
+      );
+    return options;
   }
 }

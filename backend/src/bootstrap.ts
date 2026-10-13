@@ -1,3 +1,4 @@
+import { RateLimiter } from "./infrastructure/rate-limiter";
 import "reflect-metadata";
 import { NestFactory } from "@nestjs/core";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
@@ -12,47 +13,63 @@ import { ErrorFilter, type AuthRequest } from "./shared/http";
 export async function createApp(config: AppConfig) {
   const app = await NestFactory.create(AppModule.register(config), {
     bodyParser: false,
+    abortOnError: false,
     logger: config.environment === "test" ? false : ["error", "warn", "log"],
   });
   app.setGlobalPrefix("api/v1");
   app.use(helmet());
   app.use(cookieParser());
-  app.use(json({ limit: "128kb" }));
   app.enableCors({ origin: config.frontendOrigin, credentials: true });
-  const buckets = new Map<string, { count: number; reset: number }>();
-  app.use((request: AuthRequest, response: Response, next: NextFunction) => {
-    request.requestId = randomUUID();
-    response
-      .set("X-Request-Id", request.requestId)
-      .set("Cache-Control", "no-store");
-    if (!["GET", "HEAD", "OPTIONS"].includes(request.method)) {
-      const now = Date.now(),
-        sensitive = /\/(auth|applications)\//.test(request.path),
-        key = `${request.ip}:${sensitive ? "sensitive" : "write"}`;
-      if (buckets.size > 10000)
-        for (const [id, bucket] of buckets)
-          if (bucket.reset <= now) buckets.delete(id);
-      const bucket = buckets.get(key);
-      const active =
-        !bucket || bucket.reset <= now
-          ? { count: 0, reset: now + 60000 }
-          : bucket;
-      active.count++;
-      buckets.set(key, active);
-      if (active.count > (sensitive ? 30 : 200)) {
-        response
-          .set("Retry-After", String(Math.ceil((active.reset - now) / 1000)))
-          .status(429)
-          .json({
-            code: "RATE_LIMITED",
-            message: "Çok fazla istek gönderildi. Biraz sonra tekrar deneyin.",
+  const rateLimiter = app.get(RateLimiter);
+  app.use(
+    async (request: AuthRequest, response: Response, next: NextFunction) => {
+      request.requestId = randomUUID();
+      response
+        .set("X-Request-Id", request.requestId)
+        .set("Cache-Control", "no-store");
+      if (!["GET", "HEAD", "OPTIONS"].includes(request.method)) {
+        const sensitive = /\/(auth|applications|contact)(?:\/|$)/.test(
+            request.path,
+          ),
+          callback = request.path === "/api/v1/integrations/events";
+        try {
+          const result = await rateLimiter.consume(
+            request.ip ?? "unknown",
+            callback ? "callback" : sensitive ? "sensitive" : "write",
+            callback ? 2000 : sensitive ? 30 : 200,
+          );
+          if (!result.allowed) {
+            response
+              .set("Retry-After", String(result.retryAfter))
+              .status(429)
+              .json({
+                code: "RATE_LIMITED",
+                message:
+                  "Çok fazla istek gönderildi. Biraz sonra tekrar deneyin.",
+                requestId: request.requestId,
+              });
+            return;
+          }
+        } catch {
+          response.status(503).json({
+            code: "UNAVAILABLE",
+            message: "İstek kontrolü şu anda kullanılamıyor.",
             requestId: request.requestId,
           });
-        return;
+          return;
+        }
       }
-    }
-    next();
-  });
+      next();
+    },
+  );
+  app.use(
+    json({
+      limit: "128kb",
+      verify: (request, _response, buffer) => {
+        (request as AuthRequest).rawBody = Buffer.from(buffer);
+      },
+    }),
+  );
   // Body-parser failures happen outside Nest's exception boundary.
   app.use(
     (
@@ -70,6 +87,7 @@ export async function createApp(config: AppConfig) {
         response.status(error.type === "entity.too.large" ? 413 : 400).json({
           code: "INVALID_BODY",
           message: "İstek içeriği geçersiz veya çok büyük.",
+          requestId: (request as AuthRequest).requestId,
         });
         return;
       }

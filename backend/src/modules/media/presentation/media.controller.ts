@@ -48,7 +48,11 @@ export class MediaController {
     @UploadedFile() file: { buffer: Buffer; size: number } | undefined,
     @Req() request: AuthRequest,
   ) {
-    const store = await this.stores.owned(slug, request.actor!.id);
+    const store = await this.stores.owned(
+      slug,
+      request.actor!.id,
+      "catalog-write",
+    );
     return this.media.upload(
       store.id,
       parse(z.enum(["product", "banner", "logo", "favicon"]), kind),

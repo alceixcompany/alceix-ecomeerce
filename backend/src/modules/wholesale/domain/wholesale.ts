@@ -1,0 +1,35 @@
+export type WholesaleOrder = {
+  id: string;
+  storeId: string;
+  partnerId: string;
+  productId: string;
+  actorId: string;
+  quantity: number;
+  maxTotalCents: number;
+  unitCents: number;
+  totalCents: number;
+  sku: string;
+  name: string;
+  image: string;
+  address: string;
+  city: string;
+  phone: string;
+  customer: string;
+  status: "preparing" | "shipped" | "delivered" | "cancelled";
+  shipmentId: string;
+  tracking: string;
+  commissionBasisPoints: number;
+  returnDays: number;
+  settleAt?: Date;
+  settled: boolean;
+  version: number;
+  createdAt: Date;
+};
+export type ImportReceipt = {
+  id: string;
+  storeId: string;
+  partnerId: string;
+  productId: string;
+  retailProductId: string;
+  priceCents: number;
+};

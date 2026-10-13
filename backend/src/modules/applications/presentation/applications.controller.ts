@@ -1,4 +1,6 @@
-import { Body, Controller, Post } from "@nestjs/common";
+import { Body, Controller, Post, Req, UseGuards } from "@nestjs/common";
+import { SessionGuard } from "../../auth/presentation/session.guard";
+import type { AuthRequest } from "../../../shared/http";
 import { ApiTags } from "@nestjs/swagger";
 import { z } from "zod";
 import { ApplicationsService } from "../application/applications.service";
@@ -43,6 +45,26 @@ const influencer = z
 @Controller("applications")
 export class ApplicationsController {
   constructor(private readonly applications: ApplicationsService) {}
+  @Post("account/supplier")
+  @UseGuards(SessionGuard)
+  @ApiInput(supplier)
+  ownedSupplier(@Req() req: AuthRequest, @Body() body: unknown) {
+    return this.applications.submit(
+      "supplier",
+      parse(supplier, body),
+      req.actor!.id,
+    );
+  }
+  @Post("account/influencer")
+  @UseGuards(SessionGuard)
+  @ApiInput(influencer)
+  ownedInfluencer(@Req() req: AuthRequest, @Body() body: unknown) {
+    return this.applications.submit(
+      "influencer",
+      parse(influencer, body),
+      req.actor!.id,
+    );
+  }
   @Post("supplier") @ApiInput(supplier) supplier(@Body() body: unknown) {
     return this.applications.submit("supplier", parse(supplier, body));
   }

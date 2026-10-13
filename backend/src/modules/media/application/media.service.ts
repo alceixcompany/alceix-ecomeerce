@@ -52,6 +52,7 @@ export class MediaService {
         id,
         storeId,
         kind,
+        lifecycle: "unclaimed",
         createdAt: new Date(),
         size: buffer.length,
       });
@@ -71,13 +72,29 @@ export class MediaService {
           "Görseli önce mağazanıza yükleyin.",
         );
       const media = await this.records.byId(url.slice(prefix.length));
-      if (!media || media.storeId !== storeId || media.kind !== kind)
+      if (
+        !media ||
+        media.storeId !== storeId ||
+        media.kind !== kind ||
+        !(await this.records.retain(media.id))
+      )
         throw new AppError(
           422,
           "INVALID_MEDIA",
           "Görsel bu mağazaya veya alana ait değil.",
         );
     }
+  }
+  async cleanup(cutoff: Date) {
+    let removed = 0;
+    for (let index = 0; index < 20; index++) {
+      const file = await this.records.garbage(cutoff);
+      if (!file) break;
+      await this.files.remove(file.id);
+      await this.records.removeRecord(file.id);
+      removed++;
+    }
+    return { removed };
   }
   async read(id: string) {
     if (!(await this.records.byId(id))) throw notFound();
@@ -86,5 +103,25 @@ export class MediaService {
     } catch {
       throw notFound();
     }
+  }
+  async copyProduct(sourceId: string, targetId: string, urls: string[]) {
+    await this.assertOwned(sourceId, urls, "product");
+    const copied: string[] = [];
+    for (const url of urls) {
+      if (sampleImages.has(url)) {
+        copied.push(url);
+        continue;
+      }
+      const buffer = await this.read(url.slice(prefix.length));
+      copied.push(
+        (
+          await this.upload(targetId, "product", {
+            buffer,
+            size: buffer.length,
+          })
+        ).url,
+      );
+    }
+    return copied;
   }
 }

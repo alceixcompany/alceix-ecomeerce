@@ -4,7 +4,7 @@ import { loadConfig } from "../config/config";
 import { assertDemoDatabase, seedDemo } from "./demo-seed";
 
 async function main() {
-  const config = loadConfig();
+  const config = loadConfig({ ...process.env, WORKERS_ENABLED: "false" });
   assertDemoDatabase(config);
   const app = await createApp(config);
   try {
